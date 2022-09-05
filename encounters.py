@@ -21,6 +21,7 @@ def random_encounter(pc):
     npc_3.set_initiative(7)
 
     in_combat = True
+    downed_list = []
     round_num = 1
     while in_combat: # main combat loop
         print(f"\n\n[ ROUND {round_num} ]\n")
@@ -44,17 +45,24 @@ def random_encounter(pc):
                 else:
                     target_list = None
                 print(f"{entity.get_name()}")
-                downed_list = entity.do_turn(target_list)
+                newly_downed = entity.do_turn(target_list)
             else:
                 target_list = npc_group # TODO: automatic enemy tracking
                 print(f"{entity.get_name()}")
-                downed_list = pc.do_turn()
-            if downed_list is not None:
-                for entity in downed_list:
+                newly_downed = pc.do_turn()
+            if newly_downed is not None:
+                if downed_list is not None:
+                    downed_list = newly_downed
+                else:
+                    downed_list + newly_downed
+                for entity in newly_downed:
                     turn_order.remove(entity)
             turn_num += 1
             print("")
 
         round_num += 1
 
-    print("\n--------------[ Encounter Complete ]--------------\n\n")
+    print("\DOWNED IN COMBAT:")
+    for entity in downed_list:
+        print(f"{entity.get_name()}")
+    print("--------------[ Encounter Ended ]--------------\n\n")
