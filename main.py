@@ -20,12 +20,15 @@ def main():
     
     keep_running = True # main game loop
     while keep_running:
-        choice = menu.display_menu("Main Menu", ["random encounter", "debug", "quit"]) 
+        choice = menu.display_menu("Main Menu", ["random encounter", "recover", "debug", "quit"]) 
         if choice == "1":
             random_encounter(pc)
         elif choice == "2":
+            pc.set_hp(pc.get_max_hp())
+            pc.rm_status('downed')
+        elif choice == "3":
             debug(pc) # runs test code in debug.py
-        elif choice in ["3", "q"]: # TODO: add letters to valid input
+        elif choice in ["4", "q"]: # TODO: add letters to valid input
             keep_running = False
             shutdown()
     

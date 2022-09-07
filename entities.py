@@ -3,12 +3,14 @@
 # NOTE: possible entity save feature for reintroducing enemies that got away with flags to make them familiar
 
 import random
-from dice import *
+from dice import Dice
+from menu import Menu
 
 class Humanoid():
 # CONSTRUCTOR - Humanoid Entity
-    def __init__(self, name, hp, base_initiative, initiative, reflex, ac, wind, stamina, recovery, equipped, inventory):
+    def __init__(self, name, max_hp, hp, base_initiative, initiative, reflex, ac, wind, stamina, recovery, equipped, inventory):
         self.name = name
+        self.max_hp = max_hp
         self.hp = hp
         self.status = []
         self.base_initiative = base_initiative
@@ -31,8 +33,8 @@ class Humanoid():
         ]
     
     # GET methods
-    def get_atk_list(self):
-        return self.atk_list
+    def get_max_hp(self):
+        return self.max_hp
     def get_hp(self):
         return self.hp
     def get_name(self):
@@ -43,6 +45,8 @@ class Humanoid():
         return self.ac
     def get_status(self):
         return self.status
+    def get_atk_list(self):
+        return self.atk_list
 
     # SET methods
     def set_hp(self, hp):
@@ -55,10 +59,14 @@ class Humanoid():
         self.atk_list = atk_list
 
     # COMBAT methods
+
     def add_status(self, status):
         self.status.append(status)
     def rm_status(self, status):
-        self.status.remove(status)
+        if status in self.status:
+            self.status.remove(status)
+        else:
+            print(f"[ERROR] Status to remove not found.")
     def take_atk(self, atk):
         # NOTE: for when attacks become more complicated
         pass
@@ -88,6 +96,7 @@ class PlayerCharacter(Humanoid):
 # CONSTRUCTOR - Player Character
     def __init__(self):
         name = "Player"
+        max_hp = 120
         hp = 120
         base_initiative = 10
         initiative = 10
@@ -98,11 +107,9 @@ class PlayerCharacter(Humanoid):
         recovery = 0
         equipped = {}
         inventory = {}
-        super().__init__(name, hp, base_initiative, initiative, reflex, ac, wind, stamina, recovery, equipped, inventory)
+        super().__init__(name, max_hp, hp, base_initiative, initiative, reflex, ac, wind, stamina, recovery, equipped, inventory)
     
     # GET methods
-    def get_atk_list(self):
-        return super().get_atk_list()
     def get_hp(self):
         return super().get_hp()
     def get_name(self):
@@ -113,6 +120,8 @@ class PlayerCharacter(Humanoid):
         return super().get_ac()
     def get_status(self):
         return super().get_status()
+    def get_atk_list(self):
+        return super().get_atk_list()
 
     # SET methods
     def set_hp(self, hp):
@@ -129,15 +138,21 @@ class PlayerCharacter(Humanoid):
         return super().rm_status(status)
     def take_dmg(self, dmg, dmgType):
         return super().take_dmg(dmg, dmgType)
-    def do_turn(self):
-        # TODO: add player turn method
-        print('- skipping...')
-        pass
+    def do_turn(self, target_list):
+        downed_list = []
+        atk_list = self.atk_list
+        Menu.display_menu(f"{self.name}'s Turn", atk_list)
+        
+        # newly_downed = self.do_atk(atk, target)
+        # if newly_downed is not None:
+        #     downed_list += newly_downed
+        return downed_list
 
 class PsyscarredHuman(Humanoid):
 # CONSTRUCTOR - Psyscarred Human
     def __init__(self):
         name = "Psyscarred Human"
+        max_hp = 100
         hp = 100
         base_initiative = 8
         initiative = 8
@@ -148,7 +163,7 @@ class PsyscarredHuman(Humanoid):
         recovery = 0
         equipped = {}
         inventory = {}
-        super().__init__(name, hp, base_initiative, initiative, reflex, ac, wind, stamina, recovery, equipped, inventory)
+        super().__init__(name, max_hp, hp, base_initiative, initiative, reflex, ac, wind, stamina, recovery, equipped, inventory)
         super().set_atk_list([
             {
             'name': 'Slam',
@@ -159,8 +174,6 @@ class PsyscarredHuman(Humanoid):
         ])
 
     # GET methods
-    def get_atk_list(self):
-        return super().get_atk_list()
     def get_hp(self):
         return super().get_hp()
     def get_name(self):
@@ -171,6 +184,8 @@ class PsyscarredHuman(Humanoid):
         return super().get_ac()
     def get_status(self):
         return super().get_status()
+    def get_atk_list(self):
+        return super().get_atk_list()
 
     # SET methods
     def set_hp(self, hp):
@@ -198,7 +213,7 @@ class PsyscarredHuman(Humanoid):
             else:
                 target_num = random.randint(1, len(target_list))
                 target = target_list[target_num - 1]
-            atk_list = self.get_atk_list()
+            atk_list = self.atk_list
             if len(atk_list) == 1:
                 atk = atk_list[0]
             else:
