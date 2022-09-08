@@ -139,14 +139,15 @@ class PlayerCharacter(Humanoid):
     def take_dmg(self, dmg, dmgType):
         return super().take_dmg(dmg, dmgType)
     def do_turn(self, target_list):
-        downed_list = []
-        atk_list = self.atk_list
-        Menu.display_menu(f"{self.name}'s Turn", atk_list)
-        
+        pass
+        # downed_list = []
+        # atk_list = self.atk_list
+        # Menu.display_menu(f"{self.name}'s Turn", atk_list)
+
         # newly_downed = self.do_atk(atk, target)
         # if newly_downed is not None:
         #     downed_list += newly_downed
-        return downed_list
+        # return downed_list
 
 class PsyscarredHuman(Humanoid):
 # CONSTRUCTOR - Psyscarred Human
