@@ -2,6 +2,10 @@
 ## Intent -
     To prototype combat based encounters for integration with a larger project
 ## Update Log -
+> v0.1.2
+- fixed issue where player downed caused other turns in round to be skipped
+- debug functions are now methods of class Debug
+- minor optimizations to random_encounter
 > v0.1.1
 - on their turn, npcs will choose an attack from their attack list and use it on a random enemy
 - combatant rolls attack checked against target ac, then rolls for and inflicts damage

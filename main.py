@@ -8,7 +8,7 @@
 from entities import PlayerCharacter
 from encounters import random_encounter
 from menu import Menu
-from debug import *
+from debug import Debug
 
 def shutdown():
     print("\n\n\n\n--------------[ Shutting Down ]--------------\n\n\n\n")
@@ -27,7 +27,7 @@ def main():
             pc.set_hp(pc.get_max_hp())
             pc.rm_status('downed')
         elif choice == "3":
-            debug(pc) # runs test code in debug.py
+            Debug.check_pc(pc) # runs test code in debug.py
         elif choice in ["4", "q"]: # TODO: add letters to valid input
             keep_running = False
             shutdown()
