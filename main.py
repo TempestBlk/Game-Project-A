@@ -6,29 +6,32 @@
 #   buff/debuff classes for timed/lingering effects in/out of combat
 
 from entities import PlayerCharacter
-from encounters import random_encounter
+from encounters import Encounter
 from menu import Menu
 from debug import Debug
 
 def shutdown():
-    print("\n\n\n\n--------------[ Shutting Down ]--------------\n\n\n\n")
+    print("\n\n\n\n[Main] Shutting down...\n\n\n\n")
 
 def main():
-    print("\n\n\n\n--------------[ Turn-Based Combat Module ]--------------")
+    print("\n\n\n\n[Main] Starting Turn-Based Combat Module")
     pc = PlayerCharacter()
-    menu = Menu()
     
     keep_running = True # main game loop
     while keep_running:
-        choice = menu.display_menu("Main Menu", ["random encounter", "recover", "debug", "quit"]) 
-        if choice == "1":
-            random_encounter(pc)
-        elif choice == "2":
+        choice = Menu.option_menu("Main Menu", ["random encounter", "check player health", "restore player", "quit"]) 
+        if choice == 1:
+            if pc.hp > 0:
+                encounter = Encounter(pc)
+                encounter.run_encounter()
+            else:
+                print("You're already dead! Restore first.")
+        elif choice == 2:
+            Debug.check_pc(pc)
+        elif choice == 3:
             pc.set_hp(pc.get_max_hp())
             pc.rm_status('downed')
-        elif choice == "3":
-            Debug.check_pc(pc) # runs test code in debug.py
-        elif choice in ["4", "q"]: # TODO: add letters to valid input
+        elif choice == 4:
             keep_running = False
             shutdown()
     

@@ -6,28 +6,22 @@ import random
 from dice import Dice
 from menu import Menu
 
-class Humanoid():
-# CONSTRUCTOR - Humanoid Entity
-    def __init__(self, name, max_hp, hp, base_initiative, initiative, reflex, ac, wind, stamina, recovery, equipped, inventory):
+# TODO: implement stamina/wind/resevoir, inventory/equipped
+
+class Entity():
+# CONSTRUCTOR - Entity
+    def __init__(self, name, max_hp, hp, initiative, ac):
         self.name = name
         self.max_hp = max_hp
         self.hp = hp
         self.status = []
-        self.base_initiative = base_initiative
         self.initiative = initiative
-        self.reflex = reflex
         self.ac = ac
-        self.wind = wind
-        self.stamina = stamina
-        self.recovery = recovery
-        self.equipped = equipped
-        self.inventory = inventory
-        # NOTE: could switch to equipped weapon list which defaults to unarmed, then define atk_list as each weapon could have multiple
         self.atk_list = [
             {
             'name': 'Fists',
             'hitMod': 0,
-            'dmg': [2, 4, 1],
+            'dmgRoll': [2, 4, 1],
             'dmgType': 'blugeoning'
             }
         ]
@@ -59,7 +53,8 @@ class Humanoid():
         self.atk_list = atk_list
 
     # COMBAT methods
-
+    def add_atk(self, atk):
+        self.atk_list += atk
     def add_status(self, status):
         self.status.append(status)
     def rm_status(self, status):
@@ -73,7 +68,7 @@ class Humanoid():
     def take_dmg(self, dmg, dmgType):
         self.hp -= dmg
     def do_atk(self, atk, target):
-        downed_list = []
+        newly_downed = []
         to_hit = Dice.roll([1, 20, atk['hitMod']])
         if to_hit < target.get_ac():
             print(f"- missed {target.get_name()} with {atk['name']}")
@@ -84,30 +79,28 @@ class Humanoid():
             print(f"- hit {target.get_name()} with {atk['name']} dealing {dmg} damage")
             print(f"- {target.get_name()} has {target.get_hp()} hp left")
         if target.get_hp() <= 0:
-            print(f"- {target.get_name()} lost consciousness!")
+            print(f"- {target.get_name()} has been downed!")
             target.add_status('downed')
-            downed_list.append(target)
-        return downed_list
-
-
+            newly_downed.append(target)
+        return newly_downed
         
 
-class PlayerCharacter(Humanoid):
+class PlayerCharacter(Entity):
 # CONSTRUCTOR - Player Character
-    def __init__(self):
-        name = "Player"
-        max_hp = 120
-        hp = 120
-        base_initiative = 10
+    def __init__(self, name="Player"):
+        max_hp = 60
+        hp = 60
         initiative = 10
-        reflex = 0
         ac = 10
-        wind = 0
-        stamina = 0
-        recovery = 0
-        equipped = {}
-        inventory = {}
-        super().__init__(name, max_hp, hp, base_initiative, initiative, reflex, ac, wind, stamina, recovery, equipped, inventory)
+        super().__init__(name, max_hp, hp, initiative, ac)
+        super().add_atk([
+            {
+            'name': 'Annihilate',
+            'hitMod': 10,
+            'dmgRoll': [5, 10, 10],
+            'dmgType': 'superluminal'
+            }
+        ])
     
     # GET methods
     def get_hp(self):
@@ -139,32 +132,28 @@ class PlayerCharacter(Humanoid):
     def take_dmg(self, dmg, dmgType):
         return super().take_dmg(dmg, dmgType)
     def do_turn(self, target_list):
-        pass
-        # downed_list = []
-        # atk_list = self.atk_list
-        # Menu.display_menu(f"{self.name}'s Turn", atk_list)
+        downed_list = []
+        target = target_list[int(Menu.option_menu("Choose a target.", target_list)) - 1]
+        atk_list = self.atk_list
+        atk = atk_list[int(Menu.option_menu("Choose an attack.", atk_list)) - 1]
+        newly_downed = self.do_atk(atk, target)
+        if newly_downed is not None:
+            downed_list += newly_downed
+        return downed_list
 
         # newly_downed = self.do_atk(atk, target)
         # if newly_downed is not None:
-        #     downed_list += newly_downed
-        # return downed_list
+        #     newly_downed += newly_downed
+        # return newly_downed
 
-class PsyscarredHuman(Humanoid):
+class PsyscarredHuman(Entity):
 # CONSTRUCTOR - Psyscarred Human
-    def __init__(self):
-        name = "Psyscarred Human"
-        max_hp = 100
-        hp = 100
-        base_initiative = 8
+    def __init__(self, name="Psyscarred Human"):
+        max_hp = 50
+        hp = 50
         initiative = 8
-        reflex = 0
         ac = 8
-        wind = 0
-        stamina = 0
-        recovery = 0
-        equipped = {}
-        inventory = {}
-        super().__init__(name, max_hp, hp, base_initiative, initiative, reflex, ac, wind, stamina, recovery, equipped, inventory)
+        super().__init__(name, max_hp, hp, initiative, ac)
         super().set_atk_list([
             {
             'name': 'Slam',
