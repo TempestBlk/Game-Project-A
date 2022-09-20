@@ -1,6 +1,3 @@
-import re
-
-
 class Menu():
     def option_menu(title, option_list):
         print(f"\n[{title}]")
