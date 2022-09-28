@@ -1,7 +1,15 @@
 # A Turn-Based PVE Module
-## Intent -
+## Goal -
     To prototype combat based encounters for integration with a larger project
 ## Update Log -
+> v0.1.4
+- added 'show stats' option to main menu for displaying importantant stats
+- added exp and lvl to PlayerCharacter
+  - added related methods to PlayerCharacter
+  - checks for levelup at end of encounter
+- consolidated get and set methods in entities.py
+- new Attacks class for tracking info on all atks
+
 > v0.1.3
 - added target and attack menus on player turn
 - made random_encounter into Encounter class with run_encounter method
@@ -15,10 +23,12 @@
 - implements add_atk method for Entity (takes a list of attack dicts)
 - cannot choose "random encounter" from main menu if player hp <= 0
 - other minor improvements to run_encounter, & option_menu
+
 > v0.1.2
 - fixed issue where player downed caused other turns in round to be skipped
 - debug functions are now methods of class Debug
 - minor optimizations to random_encounter
+
 > v0.1.1
 - on their turn, npcs will choose an attack from their attack list and use it on a random enemy
 - combatant rolls attack checked against target ac, then rolls for and inflicts damage
@@ -27,5 +37,6 @@
 - npcs can wait on their turn if no more hostile targets
 - if pc is downed, encounter ends when round concludes
 - minor changes, setup for player turns
+
 > v0.1.0
 - new project
