@@ -10,7 +10,7 @@ class Menu():
         for option in option_list:
             valid_input.append(str(counter))
             if hasattr(option, 'hp'): # if option has hp, probably entity
-                name = option.get_name()
+                name = option.get('name')
                 print(f"{counter}: {name}")
                 # command = ''.join([w[0] for w in name.split()]).lower()
                 # option_dict[command] = counter
