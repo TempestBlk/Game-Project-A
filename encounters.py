@@ -1,4 +1,4 @@
-from entities import PlayerCharacter, PsyscarredHuman
+from entities import PlayerCharacter, PsyscarredHuman, FleshButcher
 from operator import attrgetter
 
 from levels import Levels
@@ -16,10 +16,9 @@ class Encounter():
     def random_enemies(self):
         # building npcs
         npc_1 = PsyscarredHuman("Psyscarred Human 1")
-        npc_2 = PsyscarredHuman("Psyscarred Human 2")
-        npc_3 = PsyscarredHuman("Psyscarred Human 3")
+        npc_2 = FleshButcher("Flesh Butcher 1")
         # building list of enemies
-        self.enemies = [npc_1, npc_2, npc_3]
+        self.enemies = [npc_1, npc_2]
 
 
     def run_encounter(self):

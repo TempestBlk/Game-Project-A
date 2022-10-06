@@ -2,6 +2,10 @@
 ## Goal -
     To prototype combat based encounters for integration with a larger project
 ## Update Log -
+> v0.1.5
+- added 'Flesh Butcher' to entities
+- tested encounter w/ npc w/ multiple attacks
+
 > v0.1.4
 - added 'show stats' option to main menu for displaying importantant stats
 - added exp and lvl to PlayerCharacter

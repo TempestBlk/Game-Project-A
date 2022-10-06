@@ -191,3 +191,61 @@ class PsyscarredHuman(Entity):
             return downed_list
         else:
             print("- twitches and mutters...")
+
+class FleshButcher(Entity):
+# CONSTRUCTOR - Flesh Butcher
+    def __init__(self, name="Psyscarred Human", max_hp=50, hp=50, max_init=8, init=8, ac=8):
+        super().__init__(name, max_hp, hp, max_init, init, ac)
+        super().set("atks", [
+            {
+            'name': 'Bone Cleave',
+            'hitMod': 0,
+            'dmgRoll': [3, 6, 2],
+            'dmgType': 'slashing'
+            },
+            {
+            'name': 'Bone Pierce',
+            'hitMod': 0,
+            'dmgRoll': [2, 8, 0],
+            'dmgType': 'piercing'
+            }
+        ])
+
+# GET method
+    def get(self, prop):
+        return super().get(prop)
+
+# SET method
+    def set(self, prop, value):
+        super().set(prop, value)
+
+# COMBAT methods
+    def add_status(self, status):
+        return super().add_status(status)
+    def rm_status(self, status):
+        return super().rm_status(status)
+    def take_dmg(self, dmg, dmgType):
+        return super().take_dmg(dmg, dmgType)
+    def do_atk(self, atk, target):
+        return super().do_atk(atk, target)
+    def do_turn(self, target_list):
+        downed_list = []
+        action_num = random.randint(1, 4)
+        if target_list is not None and action_num in [1, 2, 3]:
+            if len(target_list) == 1:
+                target = target_list[0]
+            else:
+                target_num = random.randint(1, len(target_list))
+                target = target_list[target_num - 1]
+            atks = self.atks
+            if len(atks) == 1:
+                atk = atks[0]
+            else:
+                atk_num = random.randint(1, len(atks))
+                atk = atks[atk_num - 1]
+            newly_downed = self.do_atk(atk, target)
+            if newly_downed is not None:
+                downed_list += newly_downed
+            return downed_list
+        else:
+            print("- scrapes bone cleaver against ribcage")
