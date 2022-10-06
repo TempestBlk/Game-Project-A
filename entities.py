@@ -5,56 +5,60 @@
 import random
 from dice import Dice
 from menu import Menu
+from attacks import Attacks
+from levels import Levels
 
-# TODO: implement stamina/wind/resevoir, inventory/equipped
+# TODO: implement stamina/wind, inventory/equipped
 
 class Entity():
 # CONSTRUCTOR - Entity
-    def __init__(self, name, max_hp, hp, initiative, ac):
+    def __init__(self, name, max_hp, hp, max_init, init, ac):
         self.name = name
         self.max_hp = max_hp
         self.hp = hp
-        self.status = []
-        self.initiative = initiative
+        self.max_init = max_init
+        self.init = init
         self.ac = ac
-        self.atk_list = [
-            {
-            'name': 'Fists',
-            'hitMod': 0,
-            'dmgRoll': [2, 4, 1],
-            'dmgType': 'blugeoning'
-            }
-        ]
+        self.status = []
+        self.atks = []
+        self.equipped = []
+        self.inventory = []
     
-    # GET methods
-    def get_max_hp(self):
-        return self.max_hp
-    def get_hp(self):
-        return self.hp
-    def get_name(self):
-        return self.name
-    def get_initiative(self):
-        return self.initiative
-    def get_ac(self):
-        return self.ac
-    def get_status(self):
-        return self.status
-    def get_atk_list(self):
-        return self.atk_list
+# GET method
+    def get(self, prop):
+        if prop == "max_hp":
+            return self.max_hp
+        elif prop == "hp":
+            return self.hp
+        elif prop == "name":
+            return self.name
+        elif prop == "max_init":
+            return self.max_init
+        elif prop == "init":
+            return self.init
+        elif prop == "ac":
+            return self.ac
+        elif prop == "status":
+            return self.status
+        elif prop == "atks":
+            return self.atks
+        elif prop == "equipped":
+            return self.equipped
 
-    # SET methods
-    def set_hp(self, hp):
-        self.hp = hp
-    def set_name(self, name):
-        self.name = name
-    def set_initiative(self, initiative):
-        self.initiative = initiative
-    def set_atk_list(self, atk_list):
-        self.atk_list = atk_list
+# SET method
+    def set(self, prop, value):
+        if prop == "name":
+            self.name = value
+        elif prop == "hp":
+            self.hp = value
+        elif prop == "init":
+            self.init = value
+        elif prop == "atks":
+            self.atks = value
 
-    # COMBAT methods
+# COMBAT methods
     def add_atk(self, atk):
-        self.atk_list += atk
+        self.atks += [atk]
     def add_status(self, status):
         self.status.append(status)
     def rm_status(self, status):
@@ -70,16 +74,16 @@ class Entity():
     def do_atk(self, atk, target):
         newly_downed = []
         to_hit = Dice.roll([1, 20, atk['hitMod']])
-        if to_hit < target.get_ac():
-            print(f"- missed {target.get_name()} with {atk['name']}")
+        if to_hit < target.get('ac'):
+            print(f"- missed {target.get('name')} with {atk['name']}")
             return
         else:
             dmg = Dice.roll(atk['dmgRoll'])
             target.take_dmg(dmg, atk['dmgType'])
-            print(f"- hit {target.get_name()} with {atk['name']} dealing {dmg} damage")
-            print(f"- {target.get_name()} has {target.get_hp()} hp left")
-        if target.get_hp() <= 0:
-            print(f"- {target.get_name()} has been downed!")
+            print(f"- hit {target.get('name')} with {atk['name']} dealing {dmg} damage")
+            print(f"- {target.get('name')} has {target.get('hp')} hp left")
+        if target.get('hp') <= 0:
+            print(f"- {target.get('name')} has been downed!")
             target.add_status('downed')
             newly_downed.append(target)
         return newly_downed
@@ -87,44 +91,24 @@ class Entity():
 
 class PlayerCharacter(Entity):
 # CONSTRUCTOR - Player Character
-    def __init__(self, name="Player"):
-        max_hp = 60
-        hp = 60
-        initiative = 10
-        ac = 10
-        super().__init__(name, max_hp, hp, initiative, ac)
-        super().add_atk([
-            {
-            'name': 'Annihilate',
-            'hitMod': 10,
-            'dmgRoll': [5, 10, 10],
-            'dmgType': 'superluminal'
-            }
-        ])
+    def __init__(self, name="Player", max_hp=60, hp=60, max_init=10, init=10, ac=10):
+        super().__init__(name, max_hp, hp, max_init, init, ac)
+        self.add_atk(Attacks.atk_dict["Fists"])
+        self.add_atk(Attacks.atk_dict["Annihilate"])
+        self.exp = 0
+        self.lvl = 1
     
-    # GET methods
-    def get_hp(self):
-        return super().get_hp()
-    def get_name(self):
-        return super().get_name()
-    def get_initiative(self):
-        return super().get_initiative()
-    def get_ac(self):
-        return super().get_ac()
-    def get_status(self):
-        return super().get_status()
-    def get_atk_list(self):
-        return super().get_atk_list()
+# GET method
+    def get(self, prop):
+        return super().get(prop)
 
-    # SET methods
-    def set_hp(self, hp):
-        return super().set_hp(hp)
-    def set_name(self, name):
-        return super().set_name(name)
-    def set_initiative(self, initiative):
-        return super().set_initiative(initiative)
+# SET method
+    def set(self, prop, value):
+        super().set(prop, value)
 
-    # COMBAT methods
+# COMBAT methods
+    def add_atk(self, atk):
+        return super().add_atk(atk)
     def add_status(self, status):
         return super().add_status(status)
     def rm_status(self, status):
@@ -134,27 +118,33 @@ class PlayerCharacter(Entity):
     def do_turn(self, target_list):
         downed_list = []
         target = target_list[int(Menu.option_menu("Choose a target.", target_list)) - 1]
-        atk_list = self.atk_list
-        atk = atk_list[int(Menu.option_menu("Choose an attack.", atk_list)) - 1]
+        atks = self.atks
+        atk = atks[int(Menu.option_menu("Choose an attack.", atks)) - 1]
         newly_downed = self.do_atk(atk, target)
         if newly_downed is not None:
             downed_list += newly_downed
         return downed_list
 
-        # newly_downed = self.do_atk(atk, target)
-        # if newly_downed is not None:
-        #     newly_downed += newly_downed
-        # return newly_downed
+# PlayerCharacter specific methods
+    def get_exp(self):
+        return self.exp
+    def add_exp(self, exp):
+        self.exp += exp
+    def set_exp(self, exp):
+        self.exp = exp
+    def get_lvl(self):
+        return self.lvl
+    def add_lvl(self):
+        self.lvl += 1
+    def set_lvl(self, lvl):
+        self.lvl = lvl
+
 
 class PsyscarredHuman(Entity):
 # CONSTRUCTOR - Psyscarred Human
-    def __init__(self, name="Psyscarred Human"):
-        max_hp = 50
-        hp = 50
-        initiative = 8
-        ac = 8
-        super().__init__(name, max_hp, hp, initiative, ac)
-        super().set_atk_list([
+    def __init__(self, name="Psyscarred Human", max_hp=50, hp=50, max_init=8, init=8, ac=8):
+        super().__init__(name, max_hp, hp, max_init, init, ac)
+        super().set("atks", [
             {
             'name': 'Slam',
             'hitMod': 0,
@@ -163,29 +153,15 @@ class PsyscarredHuman(Entity):
             }
         ])
 
-    # GET methods
-    def get_hp(self):
-        return super().get_hp()
-    def get_name(self):
-        return super().get_name()
-    def get_initiative(self):
-        return super().get_initiative()
-    def get_ac(self):
-        return super().get_ac()
-    def get_status(self):
-        return super().get_status()
-    def get_atk_list(self):
-        return super().get_atk_list()
+# GET method
+    def get(self, prop):
+        return super().get(prop)
 
-    # SET methods
-    def set_hp(self, hp):
-        return super().set_hp(hp)
-    def set_name(self, name):
-        return super().set_name(name)
-    def set_initiative(self, initiative):
-        return super().set_initiative(initiative)
+# SET method
+    def set(self, prop, value):
+        super().set(prop, value)
 
-    # COMBAT methods
+# COMBAT methods
     def add_status(self, status):
         return super().add_status(status)
     def rm_status(self, status):
@@ -203,12 +179,12 @@ class PsyscarredHuman(Entity):
             else:
                 target_num = random.randint(1, len(target_list))
                 target = target_list[target_num - 1]
-            atk_list = self.atk_list
-            if len(atk_list) == 1:
-                atk = atk_list[0]
+            atks = self.atks
+            if len(atks) == 1:
+                atk = atks[0]
             else:
-                atk_num = random.randint(1, len(atk_list))
-                atk = atk_list[atk_num - 1]
+                atk_num = random.randint(1, len(atks))
+                atk = atks[atk_num - 1]
             newly_downed = self.do_atk(atk, target)
             if newly_downed is not None:
                 downed_list += newly_downed

@@ -19,7 +19,7 @@ def main():
     
     keep_running = True # main game loop
     while keep_running:
-        choice = Menu.option_menu("Main Menu", ["random encounter", "check player health", "restore player", "quit"]) 
+        choice = Menu.option_menu("Main Menu", ["random encounter", "character stats", "heal character", "quit"]) 
         if choice == 1:
             if pc.hp > 0:
                 encounter = Encounter(pc)
@@ -29,8 +29,8 @@ def main():
         elif choice == 2:
             Debug.check_pc(pc)
         elif choice == 3:
-            pc.set_hp(pc.get_max_hp())
-            pc.rm_status('downed')
+            pc.set("hp", pc.get("max_hp"))
+            pc.rm_status('downed') # NOTE: currently only removes the 'downed' status
         elif choice == 4:
             keep_running = False
             shutdown()

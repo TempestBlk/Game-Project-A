@@ -1,3 +1,4 @@
 # ignore pycache files
 __pycache__/
 *.py[cod]
+*delete_me*

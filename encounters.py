@@ -1,6 +1,8 @@
 from entities import PlayerCharacter, PsyscarredHuman
 from operator import attrgetter
 
+from levels import Levels
+
 class Encounter():
     def __init__(self, pc, enemies=[], allies=[]):
         self.encounter_id = 0
@@ -34,18 +36,18 @@ class Encounter():
         in_combat = True
         while in_combat: # loops through rounds of combat
             print(f"\n\n[ROUND {round_num}]\n")
-            self.turn_order.sort(key=attrgetter('initiative'), reverse=True) # re-sorts turn order at beginning of each round
+            self.turn_order.sort(key=attrgetter('init'), reverse=True) # re-sorts turn order at beginning of each round
 
-            # Debug.check_initiative(combatants)
+            # Debug.check_init(combatants)
     
             turn_num = 1
-            for entity in self.turn_order[:]: # loops through every combatant's turn in order of highest -> lowest initiative
+            for entity in self.turn_order[:]: # loops through every combatant's turn in order of highest -> lowest init
                 if entity not in self.downed_list: # ensuring entity isn't downed
-                    print(f"Turn {turn_num}: {entity.get_name()}")
+                    print(f"Turn {turn_num}: {entity.get('name')}")
                     newly_downed = []
                     if type(entity) is PlayerCharacter:
                         target_list = self.enemies # FIXME: add support for multiple combatant groups
-                    else: # if next extity is player
+                    else: # if next extity not player
                         if self.pc in self.turn_order: # FIXME: check if npcs can still target player (replace with check for any hostile combatants)
                             target_list = [self.pc]
                         else:
@@ -74,8 +76,9 @@ class Encounter():
         # end of encounter
         print("[Encounter] Downed in combat:")
         for entity in self.downed_list:
-            print(f"{entity.get_name()}")
+            print(f"{entity.get('name')}")
         if self.pc in self.downed_list:
             print("\n[Encounter] Encounter failed, pc has fallen.\n\n")
         else:
+            Levels.check_lvlup(self.pc)
             print("\n[Encounter] Encounter complete, all enemies have fallen.\n\n")
