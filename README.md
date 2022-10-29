@@ -1,7 +1,11 @@
 # A Turn-Based PVE Module
-## Goal -
-    To prototype combat based encounters for integration with a larger project
+## Goals -
+    1. Build a module to handle turn based combat
+    2. Build a display window module
 ## Update Log -
+> v0.2.0 - Rebuilt Update
+- rebuilt everything...
+
 > v0.1.5
 - added 'Flesh Butcher' to entities
 - tested encounter w/ npc w/ multiple attacks

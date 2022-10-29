@@ -1,12 +1,20 @@
-# THIS FILE IS FOR TESTING AND DEBUGGING
-from levels import Levels
+from lifeforms import Humanoid
+
+
 
 class Debug():
-    def check_pc(pc):
-        lvlup_exp = Levels.lvl_dict[(pc.get_lvl() + 1)]
-        print(f"\n{pc.get('name')}\nlevel: {pc.get_lvl()}\nexp: {pc.get_exp()}/{lvlup_exp}\nhp: {pc.get('hp')}/{pc.get('max_hp')}\nstatus: {pc.get('status')}\ninit: {pc.get('init')}/{pc.get('max_init')}")
+    def show_attacks(humanoid):
+        print(f"\n[ {humanoid.name} ]\nmainHand: {humanoid.equipped['mainHand']} | offHand: {humanoid.equipped['offHand']} | wearable: {humanoid.equipped['wearable']}")
+        print("attacks:")
+        for attack in humanoid.attacks:
+            print(f"\tname: {attack['name']} | givenBy: {attack['givenBy']}")
+        print("inventory:")
+        for item in humanoid.inventory:
+            print(f"\tname: {item.name} | durability: {item.durability}")
 
-    def check_init(combatants):
-        print(f"\n[ DEBUG ] Current turn order -->")
-        for entity in combatants:
-            print(f"{entity.get('name')}: {entity.get('init')}")
+
+    def test_npcid():
+        npc1 = Humanoid("name")
+        npc2 = Humanoid("name")
+        npc3 = Humanoid("name")
+        print(f"\t\t{npc1.npcid} | {npc2.npcid} | {npc3.npcid}")

@@ -1,40 +1,40 @@
-# A Turn-based Combat Module
-#
-# TODO:
-#   combo class based on multi-weapon atks and more!
-#   entity "base"/"max" stats to reset obj attribute
-#   buff/debuff classes for timed/lingering effects in/out of combat
-
-from entities import PlayerCharacter
-from encounters import Encounter
-from menu import Menu
 from debug import Debug
+from lifeforms import PlayerCharacter
+from encounters import Encounter
+from interface import Interface
+from items import Weapons, Weapon
 
-def shutdown():
-    print("\n\n\n\n[Main] Shutting down...\n\n\n\n")
+
 
 def main():
-    print("\n\n\n\n[Main] Starting Turn-Based Combat Module")
-    pc = PlayerCharacter()
-    
-    keep_running = True # main game loop
-    while keep_running:
-        choice = Menu.option_menu("Main Menu", ["random encounter", "character stats", "heal character", "quit"]) 
-        if choice == 1:
+    gameRunning = True
+    while gameRunning:
+        userInput = Interface.mainMenu(pc) 
+        if userInput == "1":
             if pc.hp > 0:
-                encounter = Encounter(pc)
-                encounter.run_encounter()
+                Interface.clear()
+                Encounter(pc, difficulty=1)
             else:
-                print("You're already dead! Restore first.")
-        elif choice == 2:
-            Debug.check_pc(pc)
-        elif choice == 3:
-            pc.set("hp", pc.get("max_hp"))
-            pc.rm_status('downed') # NOTE: currently only removes the 'downed' status
-        elif choice == 4:
-            keep_running = False
-            shutdown()
-    
+                print(f"\n{pc.name} is dead...")
+                Interface.pressEnter()
+        elif userInput == "2":
+            pc.hp = pc.max_hp
+            Interface.clear()
+        elif userInput == "3":
+            print("\n--------------[ Shutting Down ]--------------")
+            Interface.pressEnter()
+            gameRunning = False
+        elif userInput == "test":
+            Interface.clear()
+            Debug.test_npcid()
 
-if __name__ == '__main__':
+    print("\n\n")
+
+
+if __name__ == "__main__":
+    Interface.titleCard()
+
+    pc = PlayerCharacter("Jr Researcher Krycek", "researcher") # NOTE: "if save file, load pc from file, else start newgame"
+    pc.equip_weapon(Weapon(Weapons.metal_pipe))
+
     main()
