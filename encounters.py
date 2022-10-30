@@ -2,6 +2,7 @@ import random
 from lifeforms import Mindless, Humanoid
 from attacks import Attack
 from interface import Interface
+from items import Weapons, Weapon
 
 
 
@@ -9,13 +10,20 @@ class Encounters():
     eid = 0
 
     easy_encounters = [
-        [["mindless","Mindless-1"]],
-        [["humanoid","Vagrant-1"]],
+        [{"id": "mindless", "name": "Mindless-1"}],
+
+        [{"id": "humanoid","name": "Vagrant-1"}],
         ]
+
     medium_encounters = [
-        [["humanoid","Vagrant-1"]],
-        [["mindless","Mindless-1"], ["mindless","Mindless-2"]]
+        [{"id": "humanoid", "name": "Vagrant-1", "mainHand": Weapons.shiv}],
+
+        [
+        {"id": "mindless","name": "Mindless-1"},
+        {"id": "mindless","name": "Mindless-2"}
         ]
+        ]
+
     hard_encounter = []
 
 
@@ -27,13 +35,18 @@ class Encounters():
         else:
             Interface.error03()
         
-        for enemy in scenario:
-            if enemy[0] == "humanoid":
-                humanoid = Humanoid(enemy[1])
-                enemies.append(humanoid)
-            elif enemy[0] == "mindless":
-                mindless = Mindless(enemy[1])
-                enemies.append(mindless)
+        for lifeform in scenario:
+            if lifeform["id"] == "humanoid":
+                enemy = Humanoid(lifeform["name"])
+            elif lifeform["id"] == "mindless":
+                enemy = Mindless(lifeform["name"])
+                
+            if "mainHand" in lifeform:
+                weapon = Weapon(lifeform['mainHand'])
+                enemy.equip_weapon(weapon)
+
+            enemies.append(enemy)
+
         return enemies
 
 

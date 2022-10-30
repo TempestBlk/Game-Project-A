@@ -3,9 +3,17 @@
     1. Build a module to handle turn based combat
     2. Build a display window module
 ## Update Log -
+> v0.2.2
+- added Merchant, Doctor, and Inventory
+- added gold flakes as currency
+- improved encounter menu
+- player character now recieves +2 max_hp on levelup
+- added humanoid.unequip
+- improved Encounters.buildEnemies
+
 > v0.2.1
 - added player character levelup
--  moved Encounter prints to Interface
+- Interface now handles Encounter prints
 
 > v0.2.0 - Rebuilt Update
 - rebuilt module from the ground up...

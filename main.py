@@ -1,6 +1,6 @@
 from debug import Debug
-from lifeforms import PlayerCharacter
 from encounters import Encounter
+from lifeforms import PlayerCharacter
 from interface import Interface
 from items import Weapons, Weapon
 
@@ -9,32 +9,37 @@ from items import Weapons, Weapon
 def main():
     gameRunning = True
     while gameRunning:
+
         userInput = Interface.mainMenu(pc) 
+        
         if userInput == "1":
-            if pc.hp > 0:
-                Interface.clear()
-                Encounter(pc, difficulty=1)
-            else:
-                print(f"\n{pc.name} is dead...")
-                Interface.pressEnter()
+            Interface.encounterMenu(pc, Encounter)
+        
         elif userInput == "2":
-            pc.hp = pc.max_hp
-            Interface.clear()
+            Interface.inventoryMenu(pc)
+        
         elif userInput == "3":
-            print("\n--------------[ Shutting Down ]--------------")
-            Interface.pressEnter()
+            Interface.merchantMenu(pc)
+
+        elif userInput == "4":
+            Interface.doctorMenu(pc)
+
+        elif userInput == "5":
             gameRunning = False
+
         elif userInput == "test":
             Interface.clear()
             Debug.test_npcid()
 
-    print("\n\n")
+        Interface.clear()
 
 
 if __name__ == "__main__":
-    Interface.titleCard()
+    Interface.startup()
 
     pc = PlayerCharacter("Jr Researcher Krycek", "researcher") # NOTE: "if save file, load pc from file, else start newgame"
-    pc.equip_weapon(Weapon(Weapons.metal_pipe))
+    starting_items = [Weapon(Weapons.metal_pipe)]
+    pc.inventory += starting_items
 
     main()
+    Interface.shutdown()

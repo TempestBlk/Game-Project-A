@@ -24,6 +24,7 @@ class Humanoid(Lifeform):
         self.xp = 0
         self.level = 1
         self.xp_val = 10
+        self.gold_flakes = 0
         self.unarmed = [Attack.fists_one_two]
         self.equipped = {
             "mainHand": None,
@@ -49,19 +50,31 @@ class Humanoid(Lifeform):
     def equip_weapon(self, weapon):
         current_weapon = self.equipped['mainHand']
         if current_weapon is not None:
+            self.unequip_weapon(current_weapon, False)
+        else:
             for attack in list(self.attacks):
-                if attack['givenBy'] == current_weapon.name:
+                if attack['givenBy'] == 'unarmed':
                     self.attacks.remove(attack)
-            self.inventory.append(self.equipped['mainHand'])
+
+        if weapon in self.inventory:
+            self.inventory.remove(weapon)
+
         self.equipped['mainHand'] = weapon
-
-        for attack in list(self.attacks):
-            if attack['givenBy'] == 'unarmed':
-                self.attacks.remove(attack)
-
         for attack in weapon.attacks:
             attack['givenBy'] = weapon.name
             self.attacks.append(attack)
+
+
+    def unequip_weapon(self, current_weapon, unarmed=True):
+        for attack in list(self.attacks):
+            if attack['givenBy'] == current_weapon.name:
+                self.attacks.remove(attack)
+        self.inventory.append(self.equipped['mainHand'])
+        self.equipped['mainHand'] = None
+
+        if unarmed:
+            for attack in self.unarmed:
+                self.attacks.append(attack)
 
 
 
