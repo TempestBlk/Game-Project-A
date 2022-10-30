@@ -3,8 +3,12 @@
     1. Build a module to handle turn based combat
     2. Build a display window module
 ## Update Log -
+> v0.2.1
+- added player character levelup
+-  moved Encounter prints to Interface
+
 > v0.2.0 - Rebuilt Update
-- rebuilt everything...
+- rebuilt module from the ground up...
 
 > v0.1.5
 - added 'Flesh Butcher' to entities

@@ -38,25 +38,6 @@ class Encounters():
 
 
 
-class Reporter():
-    def __init__(self):
-        self.round_counter = 1
-        self.turn_counter = 1
-        self.nextRound()
-    
-    def nextRound(self):
-        self.round_report = "\n\n-----------------------------"
-        self.turn_report = ""
-
-    def print(self):
-        self.turn_report += "\n\n-----------------------------"
-        print(self.round_report + self.turn_report)
-        self.round_report = "\n\n-----------------------------"
-        self.turn_report = ""
-
-
-
-
 class Encounter(Encounters):
     def __init__(self, pc, difficulty=None, allies=[], unaffiliated=[]):
         self.eid = Encounters.eid
@@ -89,34 +70,13 @@ class Encounter(Encounters):
         self.combatants += self.unaffiliated
 
 
-    def doTurn(self, report, actor, target_list=False):
-        if not target_list:
-            report.turn_report += "\n--> Waits..."
-            return None
-
-        action_decider = random.randint(1, 5)
-        if action_decider == 0:
-            report.turn_report += "\n--> Waits..."
-            return None
-        
-        target = random.choice(target_list)
-        attack = random.choice(actor.attacks)
-        report.turn_report += f"\n--> Attacks {target.name} with {attack['name']}."
-        
-        downed_list = []
-        downed = Attack.single_target(report, actor, target, attack)
-        downed_list += downed
-        return downed_list
-
-
     def start(self):
         self.buildCombatants()
         Interface.encounterStart()
-        report = Reporter()
+        reporter = Reporter()
         
         while self.in_combat:
-            report.round_report += f"\n\n\t[Round {report.round_counter}]"
-            report.round_counter += 1
+            reporter.nextRound()
 
             self.turn_order = sorted(self.combatants, key=lambda x: x.init, reverse=True)
             
@@ -129,11 +89,8 @@ class Encounter(Encounters):
                 else:
                     return Interface.error01()
                 
-                report.turn_report += f"\n\nTurn {report.turn_counter} : {actor.name}"
-                report.turn_counter += 1
+                downed_list = self.doTurn(reporter, actor, target_list)
 
-                downed_list = self.doTurn(report, actor, target_list)
-                
                 if downed_list:
                     if actor is self.pc:
                         for lifeform in downed_list:
@@ -156,27 +113,71 @@ class Encounter(Encounters):
 
                 self.turn_order.remove(actor)
                 self.turn_order.sort(reverse=True, key=lambda x: x.init)
-            
-            Interface.characterInfo(self.pc)
-            
-            report.print()
 
             if not self.enemies:
                 self.in_combat = False
+
+            Interface.characterInfo(self.pc)
+            reporter.print()
             Interface.pressEnter()
         
-        print(f"\n\t--- [Encounter Ended] ---\n")
-        
-        if self.pc not in self.combatants:
-            print(f"{self.pc.name} has fallen in battle!")
-        else:
-            print(f"{self.pc.name} gained {self.player_xp} xp.")
-            self.pc.xp += self.player_xp
+        Interface.encounterEnd(self)
+        self.pc.addXp(self.player_xp)
 
-        if self.all_downed:
-            print(f"\nDowned:")
-            for lifeform in self.all_downed:
-                print(f"- {lifeform.name}")
+
+    def doTurn(self, reporter, actor, target_list=False):
+        reporter.nextTurn(actor)
         
-        Interface.pressEnter()
-            
+        if not target_list:
+            reporter.turn_report += "\n--> Waits..."
+            return None
+
+        action_decider = random.randint(1, 5)
+        if action_decider == 0:
+            reporter.turn_report += "\n--> Waits..."
+            return None
+        
+        target = random.choice(target_list)
+        attack = random.choice(actor.attacks)
+        reporter.turn_report += f"\n--> Attacks {target.name} with {attack['name']}."
+        
+        downed_list = []
+        downed = Attack.single_target(reporter, actor, target, attack)
+        downed_list += downed
+        return downed_list
+
+
+
+class Reporter():
+    def __init__(self):
+        self.round_counter = 1
+        self.turn_counter = 1
+        self.reset()
+
+
+    def reset(self):
+        self.round_report = "\n\n-----------------------------"
+        self.turn_report = ""
+    
+
+    def nextRound(self):
+        self.round_report += f"\n\n\t[Round {self.round_counter}]"
+        self.round_counter += 1
+
+
+    def nextTurn(self, actor):
+        if actor.hp > actor.max_hp / 2:
+           actor_health = "Healthy"
+        elif actor.hp > actor.max_hp / 4:
+            actor_health = "Bloodied"
+        else:
+            actor_health = "Dying"
+
+        self.turn_report += f"\n\nTurn {self.turn_counter} : {actor.name} | {actor_health}"
+        self.turn_counter += 1
+
+
+    def print(self):
+        self.turn_report += "\n\n-----------------------------"
+        print(self.round_report + self.turn_report)
+        self.reset()

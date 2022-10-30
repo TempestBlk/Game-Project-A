@@ -1,4 +1,5 @@
 from attacks import Attack
+from levelup import Levelup
 
 
 
@@ -21,6 +22,7 @@ class Humanoid(Lifeform):
         self.init = self.max_init
         self.dodge_class = 10
         self.xp = 0
+        self.level = 1
         self.xp_val = 10
         self.unarmed = [Attack.fists_one_two]
         self.equipped = {
@@ -34,13 +36,13 @@ class Humanoid(Lifeform):
             self.attacks.append(attack)
         self.inventory = []
         self.protection = {
-            "head": {"slash":0, "pierce":0, "blunt":0},
-            "torso": {"slash":0, "pierce":0, "blunt":0},
-            "stomach": {"slash":0, "pierce":0, "blunt":0},
-            "arms": {"slash":0, "pierce":0, "blunt":0},
-            "legs": {"slash":0, "pierce":0, "blunt":0},
-            "hands": {"slash":0, "pierce":0, "blunt":0},
-            "feet": {"slash":0, "pierce":0, "blunt":0},
+            'head': {'slash':0, 'pierce':0, 'blunt':0},
+            'torso': {'slash':0, 'pierce':0, 'blunt':0},
+            'stomach': {'slash':0, 'pierce':0, 'blunt':0},
+            'arms': {'slash':0, 'pierce':0, 'blunt':0},
+            'legs': {'slash':0, 'pierce':0, 'blunt':0},
+            'hands': {'slash':0, 'pierce':0, 'blunt':0},
+            'feet': {'slash':0, 'pierce':0, 'blunt':0},
             }
     
 
@@ -68,6 +70,10 @@ class PlayerCharacter(Humanoid):
         super().__init__(name)
         self.background = background
         self.xp_val = 0
+    
+    def addXp(self, value):
+        self.xp += value
+        Levelup.check(self)
 
 
 
