@@ -1,4 +1,4 @@
-# A Turn-Based PVE Module
+# A Turn-Based Combat Module
 ## Goals -
     1. Build a module to handle turn based combat
     2. Build a display window module
