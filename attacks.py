@@ -6,7 +6,7 @@ class Attack():
     metal_pipe_slam = {
         "id": "metal_pipe_slam",
         "name": "Slam",
-        "toHit": 12,
+        "toHit": 10,
         "damage": [1,8,1],
         "damageType": "blunt",
         "twoHanded": True,
@@ -14,7 +14,7 @@ class Attack():
     metal_pipe_swing = {
         "id": "metal_pipe_swing",
         "name": "Swing",
-        "toHit": 14,
+        "toHit": 12,
         "damage": [1,6,1],
         "damageType": "blunt",
         "twoHanded": False,
@@ -22,7 +22,7 @@ class Attack():
     shiv_stab = {
         "id": "shiv_stab",
         "name": "Stab",
-        "toHit": 14,
+        "toHit": 12,
         "damage": [1,4,1],
         "damageType": "pierce",
         "twoHanded": False
@@ -30,7 +30,7 @@ class Attack():
     fists_one_two = {
         "id": "fists_one_two",
         "name": "One-two",
-        "toHit": 12,
+        "toHit": 10,
         "damage": [1,4,0],
         "damageType": "blunt",
         "twoHanded": True
@@ -43,6 +43,22 @@ class Attack():
         "damageType": "blunt",
         "twoHanded": False
         }
+    bondprint_sabre_slash = {
+        "id": "bondprint_sabre_slash",
+        "name": "Slash",
+        "toHit": 14,
+        "damage": [2,4,1],
+        "damageType": "slash",
+        "twoHanded": False
+    }
+    bondprint_sabre_cleave = {
+        "id": "bondprint_sabre_cleave",
+        "name": "Slash",
+        "toHit": 12,
+        "damage": [2,6,0],
+        "damageType": "slash",
+        "twoHanded": True
+    }
 
 
     def single_target(report, actor, target, attack, logging=False, printing=False):
@@ -65,8 +81,31 @@ class Attack():
             damage = Dice.roll(attack['damage'], logging=False, printing=printing)
             log = ""
 
-        target.hp -= damage
-        report.turn_report += f"\n--> Hit! Dealt {damage} damage.{log}"
+        # TODO:
+        # attack.givenby loses durability
+        
+        protection = target.protection['torso'][f"{attack['damageType']}"] // 10
+        damage_reduction = 0
+
+        if (protection + target.dodge_class) > toHit:
+            report.turn_report += f"\n--> Absorbed by armor!"
+            return []
+        else:
+            damage_reduction = protection * 2
+
+        if damage_reduction == 0:
+            target.hp -= damage
+            report.turn_report += f"\n--> Hit! Dealt {damage} damage.{log}"
+        else:
+            min_damage = 1
+            if damage == 1:
+                min_damage = 0
+            if damage_reduction >= damage:
+                damage_reduction = damage - min_damage
+                
+            reduced_damage = (damage - damage_reduction)
+            target.hp -= reduced_damage
+            report.turn_report += f"\n--> Hit! Armor absorbed {damage_reduction} damage. Dealt {reduced_damage}. {log}"
         
         downed = []
         if target.hp <= 0:

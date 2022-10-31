@@ -186,7 +186,16 @@ class Reporter():
         else:
             actor_health = "Dying"
 
-        self.turn_report += f"\n\nTurn {self.turn_counter} : {actor.name} | {actor_health}"
+        if actor.equipped['mainHand'] is not None:
+            mainHand = f"{actor.equipped['mainHand'].name}"
+        else:
+            mainHand = "None"
+        if actor.equipped['offHand'] is not None:
+            offHand = f"{actor.equipped['offhand']}"
+        else:
+            offHand = "None"
+
+        self.turn_report += f"\n\nTurn {self.turn_counter} : {actor.name} | {actor_health}\nMain-Hand: {mainHand} | Off-Hand: {offHand}"
         self.turn_counter += 1
 
 

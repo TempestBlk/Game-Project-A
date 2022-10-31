@@ -3,6 +3,20 @@
     1. Build a module to handle turn based combat
     2. Build a display window module
 ## Update Log -
+> v0.2.4
+- Wearables now provide Protection
+  - each body part recieves slash, pierce, blunt protection
+  - only torse protection applies for now
+  - every 5 protection reduces damage by 1
+  - every 10 protection decreases toHit by 1
+- updated Merchant menu
+  - can sell items for gold flakes
+  - buyPrice and sellPrice modifiers
+- "p" in main menu displays current protection
+- turn report now shows combatant weapons
+- updated Inventory to handle wearables
+- modified Attack stats
+
 > v0.2.3
 - added Equipped section to Inventory
 - improved npc menus

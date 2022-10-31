@@ -1,4 +1,5 @@
 from lifeforms import Humanoid
+from interface import Interface
 
 
 
@@ -18,3 +19,11 @@ class Debug():
         npc2 = Humanoid("name")
         npc3 = Humanoid("name")
         print(f"\t\t{npc1.npcid} | {npc2.npcid} | {npc3.npcid}")
+
+    
+    def show_protection(humanoid):
+        Interface.clear()
+        print("\n\n")
+        for body_part in humanoid.protection:
+            print(f"{body_part}: {humanoid.protection[body_part]}")
+        Interface.pressEnter()

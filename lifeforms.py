@@ -1,5 +1,6 @@
 from attacks import Attack
 from levelup import Levelup
+from items import Wearables, Wearable
 
 
 
@@ -29,7 +30,7 @@ class Humanoid(Lifeform):
         self.equipped = {
             "mainHand": None,
             "offHand": None,
-            "wearable": None,
+            "wearable": [],
             }
         self.attacks = []
         for attack in list(self.unarmed):
@@ -65,9 +66,9 @@ class Humanoid(Lifeform):
             self.attacks.append(attack)
 
 
-    def unequip_weapon(self, current_weapon, unarmed=True):
+    def unequip_weapon(self, selected_weapon, unarmed=True):
         for attack in list(self.attacks):
-            if attack['givenBy'] == current_weapon.name:
+            if attack['givenBy'] == selected_weapon.name:
                 self.attacks.remove(attack)
         self.inventory.append(self.equipped['mainHand'])
         self.equipped['mainHand'] = None
@@ -75,6 +76,31 @@ class Humanoid(Lifeform):
         if unarmed:
             for attack in self.unarmed:
                 self.attacks.append(attack)
+
+    
+    def equip_wearable(self, wearable):
+        if self.equipped['wearable']:
+            self.equipped['wearable'].append(wearable)
+        else:
+            self.equipped['wearable'].append(wearable)
+
+        if wearable in self.inventory:
+            self.inventory.remove(wearable)
+        
+        for body_part in wearable.protection:
+            self.protection[body_part]['slash'] += wearable.protection[body_part][0]
+            self.protection[body_part]['pierce'] += wearable.protection[body_part][1]
+            self.protection[body_part]['blunt'] += wearable.protection[body_part][2]
+
+
+    def unequip_wearable(self, wearable):
+        for body_part in wearable.protection:
+            self.protection[body_part]['slash'] -= wearable.protection[body_part][0]
+            self.protection[body_part]['pierce'] -= wearable.protection[body_part][1]
+            self.protection[body_part]['blunt'] -= wearable.protection[body_part][2]
+        
+        self.equipped['wearable'].remove(wearable)
+        self.inventory.append(wearable)
 
 
 

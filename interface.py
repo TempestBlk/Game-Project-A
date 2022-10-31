@@ -1,5 +1,5 @@
 import os
-from items import Weapons, Weapon
+from items import Weapons, Weapon, Wearable
 
 
 
@@ -42,7 +42,7 @@ class Interface():
         if pc.equipped['wearable']:
             print(f"Wearing:")
             for item in list(pc.equipped['wearable']):
-                print(f"- {item['name']}  ({item.durability})")
+                print(f"- {item.name}  ({item.durability})")
         else:
             print(f"Wearing: None")
 
@@ -97,29 +97,71 @@ class Interface():
 
 
     def merchantMenu(pc):
+        sell_mod = 0.25
+        buy_mod = 1.20
+        
         showMerchant = True
         while showMerchant:
             Interface.clear()
             print("\t--- [Merchant] ---\n")
             print("\n[Quartermaster Mathias]\n")
             print("Welcome. How can I help?\n")
+            
             userInput = input("\n[1] Weapons\n[2] Wearables\n[3] Sell\n\n\n")
+            
             if userInput == "1":
                 Interface.clear()
                 print("\t--- [Merchant] ---\n")
                 print("\n[Quartermaster Mathias]\n")
                 print("Tired of beating Mindless with your fists?\nHave a look at these.\n")
-                userInput = input(f"\n[1] Shiv ({Weapons.shiv['basePrice'] * 0})\n[2] Metal Pipe ({Weapons.metal_pipe['basePrice'] * 0})\n\n\n")
+                
+                userInput = input(f"\n[1] Shiv ({round(Weapons.shiv['basePrice'] * buy_mod)})\n[2] Metal Pipe ({round(Weapons.metal_pipe['basePrice'] * buy_mod)})\n[3] Bondprint Sabre ({round(Weapons.bondprint_sabre['basePrice'] * buy_mod)})\n\n\n")
+        
                 if userInput == "1":
-                    pc.equip_weapon(Weapon(Weapons.shiv))
+                    if pc.gold_flakes >= round(Weapons.shiv['basePrice'] * buy_mod):
+                        pc.gold_flakes -= round(Weapons.shiv['basePrice'] * buy_mod)
+                        pc.inventory.append(Weapon(Weapons.shiv))
+                    else:
+                        print("\nYou don't have the money for this...")
+                        Interface.pressEnter()
                 elif userInput == "2":
-                    pc.equip_weapon(Weapon(Weapons.metal_pipe))
+                    if pc.gold_flakes >= round(Weapons.metal_pipe['basePrice'] * buy_mod):
+                        pc.gold_flakes -= round(Weapons.metal_pipe['basePrice'] * buy_mod)
+                        pc.inventory.append(Weapon(Weapons.metal_pipe))
+                    else:
+                        print("\nYou don't have the money for this...")
+                        Interface.pressEnter()
+                elif userInput == "3":
+                    if pc.gold_flakes >= round(Weapons.bondprint_sabre['basePrice'] * buy_mod):
+                        pc.gold_flakes -= round(Weapons.bondprint_sabre['basePrice'] * buy_mod)
+                        pc.inventory.append(Weapon(Weapons.bondprint_sabre))
+                    else:
+                        print("\nYou don't have the money for this...")
+                        Interface.pressEnter()
+
             elif userInput == "2":
                 print("\n\nSorry, I'm all out of body armor...")
                 Interface.pressEnter()
             elif userInput == "3":
-                print("\n\nI'm not interested in any of that.")
-                Interface.pressEnter()
+                Interface.clear()
+                print("\t--- [Merchant] ---\n")
+                print("\n[Quartermaster Mathias]\n")
+                print("What've you got?")
+                print(f"\nInventory:")
+                item_num = 0
+                item_dict = {}
+                for item in list(pc.inventory):
+                    item_num += 1
+                    item_dict[f"{item_num}"] = item
+                    print(f"[{item_num}] {item.name} ({round(item.basePrice * sell_mod)} GF)")
+                userInput = input("\n")
+                if userInput in item_dict:
+                    selected_item = item_dict[userInput]
+                    userInput = input("\n[1] Sell\n\n")
+                    if userInput == "1":
+                        pc.gold_flakes += round(selected_item.basePrice * sell_mod)
+                        pc.inventory.remove(selected_item)
+
             else:
                 showMerchant = False
 
@@ -160,12 +202,15 @@ class Interface():
                 userInput = input("\n")
                 if userInput in item_dict:
                     selected_item = item_dict[userInput]
-                    if type(selected_item) is Weapon:
-                        userInput = input("\n[1] Equip\n[2] Drop\n\n")
-                        if userInput == "1":
+                    userInput = input("\n[1] Equip\n[2] Drop\n\n")
+                    if userInput == "1":
+                        if type(selected_item) is Weapon:
                             pc.equip_weapon(selected_item)
-                        elif userInput == "2":
-                            pc.inventory.remove(selected_item)
+                        elif type(selected_item) is Wearable:
+                            pc.equip_wearable(selected_item)
+                    elif userInput == "2":
+                        pc.inventory.remove(selected_item)
+                    
                 elif userInput == "0":
                     inEquipped = True
                     while inEquipped:
@@ -176,14 +221,14 @@ class Interface():
                         if pc.equipped['mainHand']:
                             item_num += 1
                             print(f"Main-Hand: [{item_num}] {pc.equipped['mainHand'].name} ({item.durability})", end=" ")
-                            item_dict[f"{item_num}"] = pc.equipped['mainHand'], 'mainHand'
+                            item_dict[f"{item_num}"] = [pc.equipped['mainHand'], 'mainHand']
                         else:
                             print(f"Main-Hand: None", end=" ")
 
                         if pc.equipped['offHand']:
                             item_num += 1
                             print(f"| Off-Hand: [{item_num}] {pc.equipped['offHand'].name} ({item.durability})")
-                            item_dict[f"{item_num}"] = pc.equipped['offHand'], 'offhand'
+                            item_dict[f"{item_num}"] = [pc.equipped['offHand'], 'offhand']
                         else:
                             print(f"| Off-Hand: None")
 
@@ -193,7 +238,7 @@ class Interface():
                             for item in pc.equipped['wearable']:
                                 item_num += 1
                                 print(f"[{item_num}] {item.name} ({item.durability})")
-                                item_dict[f"{item_num}"] = item, 'wearable'
+                                item_dict[f"{item_num}"] = [item, 'wearable']
                         else:
                             print("None")
                         
@@ -201,14 +246,16 @@ class Interface():
 
                         userInput = input("\n")
                         if userInput in item_dict:
+                            selected_item = item_dict[userInput][0]
+                            equip_type = item_dict[userInput][1]
                             userInput = input("\n[1] Unequip\n\n")
                             if userInput == "1":
-                                if item_dict[userInput][1] == "mainHand":
-                                    pc.unequip_weapon(item_dict[userInput][0])
-                                elif item_dict[userInput][1] == "offHand":
+                                if equip_type == "mainHand":
+                                    pc.unequip_weapon(selected_item)
+                                elif equip_type == "offHand":
                                     pass
-                                elif item_dict[userInput][1] == "wearable":
-                                    pass
+                                elif equip_type == "wearable":
+                                    pc.unequip_wearable(selected_item)
                         elif userInput == "0":
                             inEquipped = False
                         else:
