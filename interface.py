@@ -30,25 +30,25 @@ class Interface():
             print(f"\n[{pc.name}]\n\nHp: {pc.hp} / {pc.max_hp}\nLevel: {pc.level} | Xp: {pc.xp}\nInitiative: {pc.init} | Dodge Class: {pc.dodge_class}\nGold Flakes: {pc.gold_flakes}\n")
 
         if pc.equipped['mainHand'] is not None:
-            mainHand = pc.equipped['mainHand'].name
+            mainHand = f"{pc.equipped['mainHand'].name} ({pc.equipped['mainHand'].durability})"
         else:
             mainHand = "None"
         if pc.equipped['offHand'] is not None:
-            offHand = pc.equipped['offhand']
+            offHand = f"{pc.equipped['offhand']} ({pc.equipped['mainHand'].durability})"
         else:
             offHand = "None"
         print(f"Main-Hand: {mainHand} | Off-Hand: {offHand}")
 
         if pc.equipped['wearable']:
-            print(f"\nWearing:")
+            print(f"Wearing:")
             for item in list(pc.equipped['wearable']):
-                print(f"- {item['name']}")
+                print(f"- {item['name']}  ({item.durability})")
         else:
-            print(f"\nWearing: None")
+            print(f"Wearing: None")
 
 
     def mainMenu(pc):
-        print("\n\t--- [Main Menu] ---")
+        print("\t--- [Main Menu] ---\n")
         Interface.characterInfo(pc)
         userInput = input("\n\n[1] Next Encounter\n[2] Inventory\n[3] Merchant\n[4] Doctor\n[5] Quit Game\n\n\n")
         return userInput
@@ -56,12 +56,12 @@ class Interface():
     
     def encounterStart():
         Interface.clear()
-        print(f"\n\t--- [Encounter Starting] ---")
+        print(f"\t--- [Encounter Starting] ---\n")
         Interface.pressEnter()
 
 
     def encounterEnd(encounter):
-        print(f"\n\t--- [Encounter Ended] ---\n")
+        print(f"\t--- [Encounter Ended] ---\n")
 
         if encounter.pc not in encounter.combatants:
             print(f"{encounter.pc.name} has fallen in battle!")
@@ -100,15 +100,15 @@ class Interface():
         showMerchant = True
         while showMerchant:
             Interface.clear()
-            print("\n\t--- [Merchant] ---")
+            print("\t--- [Merchant] ---\n")
             print("\n[Quartermaster Mathias]\n")
-            print("\nWelcome. How can I help?\n")
-            userInput = input("\n[1] Weapons\n[2] Wearables\n\n\n")
+            print("Welcome. How can I help?\n")
+            userInput = input("\n[1] Weapons\n[2] Wearables\n[3] Sell\n\n\n")
             if userInput == "1":
                 Interface.clear()
-                print("\n\t--- [Merchant] ---")
+                print("\t--- [Merchant] ---\n")
                 print("\n[Quartermaster Mathias]\n")
-                print("\nTired of beating Mindless with your fists?\nHave a look at these.\n")
+                print("Tired of beating Mindless with your fists?\nHave a look at these.\n")
                 userInput = input(f"\n[1] Shiv ({Weapons.shiv['basePrice'] * 0})\n[2] Metal Pipe ({Weapons.metal_pipe['basePrice'] * 0})\n\n\n")
                 if userInput == "1":
                     pc.equip_weapon(Weapon(Weapons.shiv))
@@ -117,24 +117,27 @@ class Interface():
             elif userInput == "2":
                 print("\n\nSorry, I'm all out of body armor...")
                 Interface.pressEnter()
+            elif userInput == "3":
+                print("\n\nI'm not interested in any of that.")
+                Interface.pressEnter()
             else:
                 showMerchant = False
 
 
     def doctorMenu(pc):
         Interface.clear()
-        print("\n\t--- [Doctor] ---")
+        print("\t--- [Doctor] ---\n")
         print("\n[Sr Researcher Lydia]\n")
         if pc.hp == pc.max_hp:
-            print("\nYou're healthy enough. Stop wasting my time!")
+            print("You're healthy enough. Stop wasting my time!")
         elif pc.hp > pc.max_hp * 0.5:
-            print("\nNot too bad, let me patch you up.")
+            print("Not too bad, let me patch you up.")
         elif pc.hp > pc.max_hp * 0.25:
-            print("\nYou're not looking too hot...\nHave a seat and bite down on this.")
+            print("You're not looking too hot...\nHave a seat and bite down on this.")
         elif pc.hp > 0:
-            print("\nSet them down here! We'll start surgery immediately.")
+            print("Set them down here! We'll start surgery immediately.")
         else:
-            print(f"\n{pc.name} is dead...\nGet their body in the Anubis Chamber.")
+            print(f"{pc.name} is dead...\nGet their body in the Anubis Chamber.")
         pc.hp = pc.max_hp
         Interface.pressEnter()
 
@@ -143,15 +146,17 @@ class Interface():
         inInventory = True
         while inInventory:
             Interface.clear()
+            print("\t--- [Inventory] ---\n\n")
             Interface.characterInfo(pc, stats=False)
             if pc.inventory:
+                print("\n[0] Switch to equipped")
                 print(f"\nInventory:")
                 item_num = 0
                 item_dict = {}
                 for item in list(pc.inventory):
                     item_num += 1
                     item_dict[f"{item_num}"] = item
-                    print(f"[{item_num}] {item.name}")
+                    print(f"[{item_num}] {item.name} ({item.durability})")
                 userInput = input("\n")
                 if userInput in item_dict:
                     selected_item = item_dict[userInput]
@@ -161,6 +166,54 @@ class Interface():
                             pc.equip_weapon(selected_item)
                         elif userInput == "2":
                             pc.inventory.remove(selected_item)
+                elif userInput == "0":
+                    inEquipped = True
+                    while inEquipped:
+                        Interface.clear()
+                        print("\t--- [Equipped] ---\n\n")
+                        item_num = 0
+                        item_dict = {}
+                        if pc.equipped['mainHand']:
+                            item_num += 1
+                            print(f"Main-Hand: [{item_num}] {pc.equipped['mainHand'].name} ({item.durability})", end=" ")
+                            item_dict[f"{item_num}"] = pc.equipped['mainHand'], 'mainHand'
+                        else:
+                            print(f"Main-Hand: None", end=" ")
+
+                        if pc.equipped['offHand']:
+                            item_num += 1
+                            print(f"| Off-Hand: [{item_num}] {pc.equipped['offHand'].name} ({item.durability})")
+                            item_dict[f"{item_num}"] = pc.equipped['offHand'], 'offhand'
+                        else:
+                            print(f"| Off-Hand: None")
+
+                        print("Wearing: ", end="")
+                        if pc.equipped['wearable']:
+                            print("")
+                            for item in pc.equipped['wearable']:
+                                item_num += 1
+                                print(f"[{item_num}] {item.name} ({item.durability})")
+                                item_dict[f"{item_num}"] = item, 'wearable'
+                        else:
+                            print("None")
+                        
+                        print("\n[0] Switch to inventory")
+
+                        userInput = input("\n")
+                        if userInput in item_dict:
+                            userInput = input("\n[1] Unequip\n\n")
+                            if userInput == "1":
+                                if item_dict[userInput][1] == "mainHand":
+                                    pc.unequip_weapon(item_dict[userInput][0])
+                                elif item_dict[userInput][1] == "offHand":
+                                    pass
+                                elif item_dict[userInput][1] == "wearable":
+                                    pass
+                        elif userInput == "0":
+                            inEquipped = False
+                        else:
+                            inEquipped = False
+                            inInventory = False
                 else:
                     inInventory = False
 

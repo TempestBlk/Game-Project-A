@@ -38,7 +38,7 @@ if __name__ == "__main__":
     Interface.startup()
 
     pc = PlayerCharacter("Jr Researcher Krycek", "researcher") # NOTE: "if save file, load pc from file, else start newgame"
-    starting_items = [Weapon(Weapons.metal_pipe)]
+    starting_items = [Weapon(Weapons.metal_pipe), Weapon(Weapons.shiv)]
     pc.inventory += starting_items
 
     main()

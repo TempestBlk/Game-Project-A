@@ -3,6 +3,10 @@
     1. Build a module to handle turn based combat
     2. Build a display window module
 ## Update Log -
+> v0.2.3
+- added Equipped section to Inventory
+- improved npc menus
+
 > v0.2.2
 - added Merchant, Doctor, and Inventory
 - added gold flakes as currency
