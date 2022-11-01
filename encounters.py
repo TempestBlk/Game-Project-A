@@ -2,36 +2,67 @@ import random
 from lifeforms import Mindless, Humanoid
 from attacks import Attack
 from interface import Interface
-from items import Weapons, Weapon
+from items import Weapon
 
 
 
-class Encounters():
-    eid = 0
+class Encounter():
+    eid_counter = 0
 
-    easy_encounters = [
+    light_encounters = [
         [{"id": "mindless", "name": "Mindless-1"}],
 
         [{"id": "humanoid","name": "Vagrant-1"}],
-        ]
+    ]
 
-    medium_encounters = [
-        [{"id": "humanoid", "name": "Vagrant-1", "mainHand": Weapons.shiv}],
+    average_encounters = [
+        [{"id": "humanoid", "name": "Vagrant-1", "mainHand": Weapon.shiv}],
 
-        [
-        {"id": "mindless","name": "Mindless-1"},
-        {"id": "mindless","name": "Mindless-2"}
-        ]
-        ]
+        [{"id": "mindless","name": "Mindless-1"},
+        {"id": "mindless","name": "Mindless-2"}],
+    ]
 
-    hard_encounter = []
+    difficult_encounters = [
+        [{"id": "humanoid", "name": "Vagrant-1", "mainHand": Weapon.metal_pipe},
+        {"id": "humanoid", "name": "Vagrant-2", "mainHand": Weapon.shiv}],
 
+        [{"id": "mindless", "name": "Mindless-1", "mainHand": Weapon.metal_pipe},
+        {"id": "mindless", "name": "Mindless-1"},
+        {"id": "mindless", "name": "Mindless-1"}]
+    ]
+
+
+    def __init__(self, pc, difficulty=None, allies=[], unaffiliated=[]):
+        
+        self.eid = Encounter.eid_counter
+        Encounter.eid_counter += 1
+
+        self.pc = pc
+        self.combatants = [self.pc]
+        self.allies = list(allies)
+        self.enemies = []
+        self.unaffiliated = list(unaffiliated)
+        self.difficulty = difficulty
+
+        if self.difficulty is None:
+            return Interface.error02()
+        if self.difficulty in [1,2]:
+            self.enemies = Encounter.buildEnemies(self.enemies, self.difficulty)
+        else:
+            return Interface.error03
+
+        self.all_downed = []
+        self.player_xp = 0
+        self.in_combat = True
+        self.start()
 
     def buildEnemies(enemies, difficulty):
         if difficulty == 1:
-            scenario = random.choice(list(Encounters.easy_encounters))
+            scenario = random.choice(list(Encounter.light_encounters))
         elif difficulty == 2:
-            scenario = random.choice(list(Encounters.medium_encounters))
+            scenario = random.choice(list(Encounter.average_encounters))
+        elif difficulty == 3:
+            scenario = random.choice(list(Encounter.difficult_encounters))
         else:
             Interface.error03()
         
@@ -48,32 +79,6 @@ class Encounters():
             enemies.append(enemy)
 
         return enemies
-
-
-
-class Encounter(Encounters):
-    def __init__(self, pc, difficulty=None, allies=[], unaffiliated=[]):
-        self.eid = Encounters.eid
-        Encounter.eid += 1
-
-        self.pc = pc
-        self.combatants = [self.pc]
-        self.allies = list(allies)
-        self.enemies = []
-        self.unaffiliated = list(unaffiliated)
-        self.difficulty = difficulty
-
-        if self.difficulty is None:
-            return Interface.error02()
-        if self.difficulty in [1,2]:
-            self.enemies = Encounters.buildEnemies(self.enemies, self.difficulty)
-        else:
-            return Interface.error03
-
-        self.all_downed = []
-        self.player_xp = 0
-        self.in_combat = True
-        self.start()
 
 
     def buildCombatants(self):

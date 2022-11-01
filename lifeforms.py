@@ -1,6 +1,5 @@
 from attacks import Attack
 from levelup import Levelup
-from items import Wearables, Wearable
 
 
 

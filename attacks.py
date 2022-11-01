@@ -59,6 +59,14 @@ class Attack():
         "damageType": "slash",
         "twoHanded": True
     }
+    f_collective_solspear_impale = {
+        "id": "f_collective_solspear_impale",
+        "name": "Impale",
+        "toHit": 16,
+        "damage": [2,8,1],
+        "damageType": "pierce",
+        "twoHanded": True
+    }
 
 
     def single_target(report, actor, target, attack, logging=False, printing=False):
@@ -89,6 +97,10 @@ class Attack():
 
         if (protection + target.dodge_class) > toHit:
             report.turn_report += f"\n--> Absorbed by armor!"
+
+            for item in list(target.equipped['wearable']): # NOTE: check for break
+                item.durability -= 1
+
             return []
         else:
             damage_reduction = protection * 2
@@ -106,6 +118,9 @@ class Attack():
             reduced_damage = (damage - damage_reduction)
             target.hp -= reduced_damage
             report.turn_report += f"\n--> Hit! Armor absorbed {damage_reduction} damage. Dealt {reduced_damage}. {log}"
+        
+        for item in list(target.equipped['wearable']): # NOTE: check for break
+            item.durability -= 1
         
         downed = []
         if target.hp <= 0:

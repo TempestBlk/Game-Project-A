@@ -3,6 +3,13 @@
     1. Build a module to handle turn based combat
     2. Build a display window module
 ## Update Log -
+> v0.2.5
+- added 'press enter to go back' menu hints
+- Wearables now lose durability when hit
+- npc dialogue now handled by npcs
+- inventory menu now handled by Inventory
+- improved Weapon and Wearable
+
 > v0.2.4
 - Wearables now provide Protection
   - each body part recieves slash, pierce, blunt protection
@@ -33,8 +40,11 @@
 - added player character levelup
 - Interface now handles Encounter prints
 
-> v0.2.0 - Rebuilt Update
-- rebuilt module from the ground up...
+> v0.2.0 - First Major Update!
+  
+    Rebuilt this module from the ground up.
+
+### Updates Before v0.2.0
 
 > v0.1.5
 - added 'Flesh Butcher' to entities

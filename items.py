@@ -2,7 +2,18 @@ from attacks import Attack
 
 
 
-class Weapons():
+class Item():
+
+    def build(self, item_type, pattern):
+        if item_type == 'weapon':
+            item = Weapon(pattern)
+        elif item_type == 'wearable':
+            item = Wearable(pattern)
+        return item
+
+
+
+class Weapon(Item):
     shiv = {
         "id": "shiv",
         "name": "Shiv",
@@ -17,7 +28,7 @@ class Weapons():
         "durability": 30,
         "basePrice": 8,
         "attacks": [Attack.metal_pipe_slam, Attack.metal_pipe_swing]
-        }
+    }
 
     bondprint_sabre = {
         "id": "bondprint_sabre",
@@ -25,11 +36,28 @@ class Weapons():
         "durability": 75,
         "basePrice": 65,
         "attacks": [Attack.bondprint_sabre_slash, Attack.bondprint_sabre_cleave]
+    }
 
+    f_collective_solspear = {
+        "id": "f_collective_solspear",
+        "name": "F Collective Solspear",
+        "durability": 1200,
+        "basePrice": 2200,
+        "attacks": [Attack.f_collective_solspear_impale]
     }
 
 
-class Wearables():
+    def __init__(self, weapon):
+        self.id = weapon['id']
+        self.name = weapon['name']
+        self.max_durability = weapon['durability']
+        self.durability = self.max_durability
+        self.basePrice = weapon['basePrice']
+        self.attacks = weapon['attacks']
+
+
+
+class Wearable(Item):
     # protection for parts --> [slash, pierce, blunt]
     # onEquip add protection scores to lifeform stats
     # every 5 protection = 1 damage reduction
@@ -164,26 +192,6 @@ class Wearables():
         }
     }
 
-
-
-class Item():
-    def __init__(self):
-        pass
-
-
-
-class Weapon(Item):
-    def __init__(self, weapon):
-        self.id = weapon['id']
-        self.name = weapon['name']
-        self.max_durability = weapon['durability']
-        self.durability = self.max_durability
-        self.basePrice = weapon['basePrice']
-        self.attacks = weapon['attacks']
-
-
-
-class Wearable(Item):
     def __init__(self, wearable):
         self.id = wearable['id']
         self.name = wearable['name']
