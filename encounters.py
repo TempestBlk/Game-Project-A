@@ -46,7 +46,7 @@ class Encounter():
 
         if self.difficulty is None:
             return Interface.error02()
-        if self.difficulty in [1,2]:
+        if self.difficulty in [1,2, 3]:
             self.enemies = Encounter.buildEnemies(self.enemies, self.difficulty)
         else:
             return Interface.error03
@@ -141,6 +141,7 @@ class Encounter():
         
         Interface.encounterEnd(self)
         self.pc.addXp(self.player_xp)
+        self.pc.gold_flakes += 5
 
 
     def doTurn(self, reporter, actor, target_list=False):

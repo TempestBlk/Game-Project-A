@@ -50,6 +50,7 @@ class Interface():
     def mainMenu(pc):
         print("\t--- [Main Menu] ---\n")
         Interface.characterInfo(pc)
+        # print("\n")
         userInput = input("\n[1] Next Encounter\n[2] Inventory\n[3] Merchant\n[4] Doctor\n[5] Quit Game\n\n")
         return userInput
 
