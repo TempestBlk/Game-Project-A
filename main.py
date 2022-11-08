@@ -1,5 +1,5 @@
 from debug import Debug
-from encounters import Encounter
+from encounters import EncounterBuilder
 from inventory import Inventory
 from lifeforms import PlayerCharacter
 from interface import Interface
@@ -14,9 +14,8 @@ def main():
 
         userInput = Interface.mainMenu(pc)
         
-        
         if userInput == "1":
-            Interface.encounterMenu(pc, Encounter)
+            EncounterBuilder.options(pc)
         
         elif userInput == "2":
             Inventory.open(pc)

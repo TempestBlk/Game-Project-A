@@ -1,11 +1,20 @@
+from abc import ABCMeta, abstractmethod
 from attacks import Attack
 from levelup import Levelup
 
 
 
-class Lifeform(object):
-    def __init__(self, name):
-        self.name = name
+class Lifeform(ABCMeta):
+    hp: int
+    init: int
+    attacks: list[Attack]
+    dodge_class: int
+    equipped: dict
+    protection: dict
+
+    @abstractmethod
+    def equipWeapon() -> abs:
+        pass
 
 
 
@@ -47,10 +56,10 @@ class Humanoid(Lifeform):
             }
     
 
-    def equip_weapon(self, weapon):
+    def equipWeapon(self, weapon):
         current_weapon = self.equipped['mainHand']
         if current_weapon is not None:
-            self.unequip_weapon(current_weapon, False)
+            self.unequipWeapon(current_weapon, False)
         else:
             for attack in list(self.attacks):
                 if attack['givenBy'] == 'unarmed':
@@ -65,7 +74,7 @@ class Humanoid(Lifeform):
             self.attacks.append(attack)
 
 
-    def unequip_weapon(self, selected_weapon, unarmed=True):
+    def unequipWeapon(self, selected_weapon, unarmed=True):
         for attack in list(self.attacks):
             if attack['givenBy'] == selected_weapon.name:
                 self.attacks.remove(attack)
@@ -77,7 +86,7 @@ class Humanoid(Lifeform):
                 self.attacks.append(attack)
 
     
-    def equip_wearable(self, wearable):
+    def equipWearable(self, wearable):
         if self.equipped['wearable']:
             self.equipped['wearable'].append(wearable)
         else:
@@ -92,7 +101,7 @@ class Humanoid(Lifeform):
             self.protection[body_part]['blunt'] += wearable.protection[body_part][2]
 
 
-    def unequip_wearable(self, wearable):
+    def unequipWearable(self, wearable):
         for body_part in wearable.protection:
             self.protection[body_part]['slash'] -= wearable.protection[body_part][0]
             self.protection[body_part]['pierce'] -= wearable.protection[body_part][1]

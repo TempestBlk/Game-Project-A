@@ -161,7 +161,7 @@ class Encounter():
         reporter.turn_report += f"\n--> Attacks {target.name} with {attack['name']}."
         
         downed_list = []
-        downed = Attack.single_target(reporter, actor, target, attack)
+        downed = Attack.singleTarget(reporter, actor, target, attack)
         downed_list += downed
         return downed_list
 

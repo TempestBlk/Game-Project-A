@@ -1,5 +1,4 @@
 import os
-from items import Weapon, Weapon, Wearable
 
 
 
@@ -60,21 +59,6 @@ class Interface():
         print(f"\t--- [Levelup] ---")
         print(f"\n{lifeform.name} has reached experience level {lifeform.level}!")
         Interface.pressEnter()
-
-
-    def encounterMenu(pc, Encounter):
-        if pc.hp > 0:
-            Interface.clear()
-            userInput = input("\nChoose a difficulty.\n[1] Light\n[2] Average\n[3] Difficult\n\n[Enter] Go Back\n\n")
-            if userInput == "1":
-                Encounter(pc, difficulty=1)
-            elif userInput == "2":
-                Encounter(pc, difficulty=2)
-            elif userInput == "3":
-                Encounter(pc, difficulty=3)
-        else:
-            print(f"\n{pc.name} is dead...")
-            Interface.pressEnter()
     
 
     def encounterStart():
