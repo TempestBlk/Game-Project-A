@@ -1,7 +1,6 @@
 import os
 
 
-
 class Interface():
     def clear():
         clear = lambda: os.system('cls')
@@ -63,23 +62,7 @@ class Interface():
 
     def encounterStart():
         Interface.clear()
-        print(f"\t--- [Encounter Starting] ---\n")
-        Interface.pressEnter()
-
-
-    def encounterEnd(encounter):
-        print(f"\t--- [Encounter Ended] ---\n")
-
-        if encounter.pc not in encounter.combatants:
-            print(f"{encounter.pc.name} has fallen in battle!")
-        else:
-            print(f"{encounter.pc.name} gained {encounter.player_xp} xp.")
-
-        if encounter.all_downed:
-            print(f"\nCasualties:")
-            for lifeform in encounter.all_downed:
-                print(f"- {lifeform.name}")
-        
+        print(f"\t--- [Encounter Starting] ---")
         Interface.pressEnter()
     
 

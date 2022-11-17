@@ -1,211 +1,245 @@
 import random
-from lifeforms import Mindless, Humanoid
-from attacks import Attack
+from dice import Dice
+from lifeforms import Lifeform, Mindless, Humanoid, PlayerCharacter
 from interface import Interface
 from items import Weapon
 
 
-
-class Encounter():
-    eid_counter = 0
-
-    light_encounters = [
-        [{"id": "mindless", "name": "Mindless-1"}],
-
-        [{"id": "humanoid","name": "Vagrant-1"}],
+class Difficulty():
+    """Stores possible encounter enemies by difficulty"""
+    # NOTE: list[list[lifeform, name, main_hand_weapon]]
+    LIGHT = [
+        [[Mindless, "Mindless-1"]],
+        [[Humanoid, "Vagrant-1"]]
     ]
-
-    average_encounters = [
-        [{"id": "humanoid", "name": "Vagrant-1", "mainHand": Weapon.shiv}],
-
-        [{"id": "mindless","name": "Mindless-1"},
-        {"id": "mindless","name": "Mindless-2"}],
+    AVERAGE = [
+        [[Humanoid, "Vagrant-1", Weapon.shiv]],
+        [[Mindless, "Mindless-1"], [Mindless, "Mindless-2"]]
     ]
-
-    difficult_encounters = [
-        [{"id": "humanoid", "name": "Vagrant-1", "mainHand": Weapon.metal_pipe},
-        {"id": "humanoid", "name": "Vagrant-2", "mainHand": Weapon.shiv}],
-
-        [{"id": "mindless", "name": "Mindless-1", "mainHand": Weapon.metal_pipe},
-        {"id": "mindless", "name": "Mindless-1"},
-        {"id": "mindless", "name": "Mindless-1"}]
+    DIFFICULT = [
+        [[Humanoid, "Vagrant-1", Weapon.metal_pipe], [Humanoid, "Vagrant-2", Weapon.shiv]],
+        [[Mindless, "Mindless-1", Weapon.metal_pipe], [Mindless, "Mindless-1"], [Mindless, "Mindless-1"]]
     ]
 
 
-    def __init__(self, pc, difficulty=None, allies=[], unaffiliated=[]):
-        
-        self.eid = Encounter.eid_counter
-        Encounter.eid_counter += 1
 
-        self.pc = pc
-        self.combatants = [self.pc]
-        self.allies = list(allies)
-        self.enemies = []
-        self.unaffiliated = list(unaffiliated)
-        self.difficulty = difficulty
-
-        if self.difficulty is None:
-            return Interface.error02()
-        if self.difficulty in [1,2, 3]:
-            self.enemies = Encounter.buildEnemies(self.enemies, self.difficulty)
-        else:
-            return Interface.error03
-
-        self.all_downed = []
-        self.player_xp = 0
-        self.in_combat = True
-        self.start()
-
-    def buildEnemies(enemies, difficulty):
-        if difficulty == 1:
-            scenario = random.choice(list(Encounter.light_encounters))
-        elif difficulty == 2:
-            scenario = random.choice(list(Encounter.average_encounters))
-        elif difficulty == 3:
-            scenario = random.choice(list(Encounter.difficult_encounters))
-        else:
-            Interface.error03()
-        
-        for lifeform in scenario:
-            if lifeform["id"] == "humanoid":
-                enemy = Humanoid(lifeform["name"])
-            elif lifeform["id"] == "mindless":
-                enemy = Mindless(lifeform["name"])
-                
-            if "mainHand" in lifeform:
-                weapon = Weapon(lifeform['mainHand'])
-                enemy.equip_weapon(weapon)
-
-            enemies.append(enemy)
-
-        return enemies
-
-
-    def buildCombatants(self):
-        self.combatants += self.enemies
-        self.combatants += self.allies
-        self.allies += [self.pc]
-        self.combatants += self.unaffiliated
-
-
-    def start(self):
-        self.buildCombatants()
-        Interface.encounterStart()
-        reporter = Reporter()
-        
-        while self.in_combat:
-            reporter.nextRound()
-
-            self.turn_order = sorted(self.combatants, key=lambda x: x.init, reverse=True)
-            
-            while len(self.turn_order) > 0:
-                actor = self.turn_order[0]
-                if actor in self.allies:
-                    target_list = self.enemies
-                elif actor in self.enemies:
-                    target_list = self.allies + [self.pc]
-                else:
-                    return Interface.error01()
-                
-                downed_list = self.doTurn(reporter, actor, target_list)
-
-                if downed_list:
-                    if actor is self.pc:
-                        for lifeform in downed_list:
-                            self.player_xp += lifeform.xp_val
-
-                    for lifeform in downed_list:
-                        self.combatants.remove(lifeform)
-                        self.all_downed.append(lifeform)
-                        if lifeform in self.turn_order:
-                            self.turn_order.remove(lifeform)
-                        
-                        if lifeform is self.pc:
-                            self.in_combat = False
-                        elif lifeform in self.enemies:
-                            self.enemies.remove(lifeform)
-                        elif lifeform in self.allies:
-                            self.allies.remove(lifeform)
-                        elif lifeform in self.unaffiliated:
-                            self.unaffiliated.remove(lifeform)
-
-                self.turn_order.remove(actor)
-                self.turn_order.sort(reverse=True, key=lambda x: x.init)
-
-            if not self.enemies:
-                self.in_combat = False
-
-            Interface.characterInfo(self.pc)
-            reporter.print()
-            Interface.pressEnter()
-        
-        Interface.encounterEnd(self)
-        self.pc.addXp(self.player_xp)
-        self.pc.gold_flakes += 5
-
-
-    def doTurn(self, reporter, actor, target_list=False):
-        reporter.nextTurn(actor)
-        
-        if not target_list:
-            reporter.turn_report += "\n--> Waits..."
-            return None
-
-        action_decider = random.randint(1, 5)
-        if action_decider == 0:
-            reporter.turn_report += "\n--> Waits..."
-            return None
-        
-        target = random.choice(target_list)
-        attack = random.choice(actor.attacks)
-        reporter.turn_report += f"\n--> Attacks {target.name} with {attack['name']}."
-        
-        downed_list = []
-        downed = Attack.singleTarget(reporter, actor, target, attack)
-        downed_list += downed
-        return downed_list
+class Actor():
+    """Model for each combatant in encounter"""
+    def __init__(self, lifeform:Lifeform, group:list[Lifeform], hostiles:list[Lifeform]) -> None:
+        self.lifeform = lifeform
+        self.group = group
+        self.hostiles = hostiles
 
 
 
-class Reporter():
-    def __init__(self):
-        self.round_counter = 1
-        self.turn_counter = 1
-        self.reset()
+class EncounterReporter(object):
+    """Prints encounter events to console"""
+    border = "\n\n-----------------------------"
 
+    def __init__(self) -> None:
+        self.round_num = 0
+        self.turn_num = 0
+        self.round_log: str
 
-    def reset(self):
-        self.round_report = "\n\n-----------------------------"
-        self.turn_report = ""
     
+    def __repr__(self) -> str:
+        self.round_log += self.border
+        return self.round_log
 
-    def nextRound(self):
-        self.round_report += f"\n\n\t[Round {self.round_counter}]"
-        self.round_counter += 1
+
+    def nextRound(self) -> None:
+        self.round_log = ""
+        self.round_num += 1
+        self.round_log = self.border + f"\n\n\t[Round {self.round_num}]"
 
 
-    def nextTurn(self, actor):
-        if actor.hp > actor.max_hp / 2:
-           actor_health = "Healthy"
-        elif actor.hp > actor.max_hp / 4:
-            actor_health = "Bloodied"
+    def actorInfo(self, lifeform:Lifeform) -> None:
+        if lifeform.hp > lifeform.max_hp / 2:
+           health = "Healthy"
+        elif lifeform.hp > lifeform.max_hp / 4:
+            health = "Bloodied"
         else:
-            actor_health = "Dying"
+            health = "Dying"
 
-        if actor.equipped['mainHand'] is not None:
-            mainHand = f"{actor.equipped['mainHand'].name}"
+        if lifeform.equipped['mainHand'] is not None:
+            mainHand = f"{lifeform.equipped['mainHand'].name}"
         else:
             mainHand = "None"
-        if actor.equipped['offHand'] is not None:
-            offHand = f"{actor.equipped['offhand']}"
+
+        if lifeform.equipped['offHand'] is not None:
+            offHand = f"{lifeform.equipped['offhand']}"
         else:
             offHand = "None"
+            
+        return f"{lifeform.name} | {health}\nMain-Hand: {mainHand} | Off-Hand: {offHand}"
 
-        self.turn_report += f"\n\nTurn {self.turn_counter} : {actor.name} | {actor_health}\nMain-Hand: {mainHand} | Off-Hand: {offHand}"
-        self.turn_counter += 1
+
+    def nextTurn(self, actor:Actor) -> None:
+        self.turn_num += 1
+        header = f"\n\nTurn {self.turn_num}"
+        header += " : " + self.actorInfo(actor.lifeform)
+        self.round_log += header
 
 
-    def print(self):
-        self.turn_report += "\n\n-----------------------------"
-        print(self.round_report + self.turn_report)
-        self.reset()
+class Encounter():
+    """Handles encounters"""
+    def __init__(self, pc:PlayerCharacter, enemies:list[Lifeform], allies:list[Lifeform]=[]) -> None:
+        self.pc = pc
+        self.allies = allies + [pc]
+        self.enemies = enemies
+
+        self.combatants = self.buildCombatants()
+        self.turn_order:list[Actor]
+        self.sortTurnOrder()
+        self.reporter = EncounterReporter()
+
+        self.pc_xp = 0
+        self.downed:list[Lifeform] = []
+        self.inCombat = True
+
+
+    def buildCombatants(self) -> list[Actor]:
+        combatants = []
+        for lifeform in self.allies:
+            combatants.append(Actor(lifeform, self.allies, self.enemies))
+        for lifeform in self.enemies:
+            combatants.append(Actor(lifeform, self.enemies, self.allies))
+        return combatants
+
+    
+    def sortTurnOrder(self) -> None:
+        self.turn_order = sorted(self.combatants, key=lambda x: x.lifeform.init, reverse=True)
+
+    
+    def removeActor(self, target:Lifeform) -> None:
+        for actor in self.combatants:
+            if actor.lifeform is target:
+                actor.group.remove(target)
+                self.combatants.remove(actor)
+        self.downed.append(target)
+
+
+    def doAttack(self, actor:Actor, target:Lifeform, attack:dict) -> None:
+        toHit = Dice.roll([1,20,attack["toHit"]])
+        toHit = toHit//2
+        if toHit < target.dodge_class:
+            self.reporter.round_log += f"\n--> Missed {target.name} with {attack['name']}"
+            return
+        
+        damage_reduction:int = target.protection['torso'][attack['damageType']] // 5
+        protection = damage_reduction // 2
+
+        for item in list(target.equipped['wearable']): # TODO: check for item break
+            item.durability -= 1
+
+        if (protection + target.dodge_class) > toHit:
+            self.reporter.round_log += f"\n--> {attack} absorbed by {target.name}'s armor"
+            return
+
+        damage = Dice.roll(attack['damage']) # TODO: attack.givenby loses durability
+
+        if damage_reduction == 0:
+            self.reporter.round_log += f"\n--> Hit {target.name} with {attack['name']} dealing {damage} damage"
+            target.hp -= damage
+        elif damage == 1:
+            self.reporter.round_log += f"\n--> {attack} absorbed by {target.name}'s armor"
+            return
+        elif damage_reduction >= damage:
+            self.reporter.round_log += f"\n--> Hit {target.name} with {attack['name']} dealing 1 ({damage}-{damage_reduction}) damage"
+            target.hp -= 1
+        else:
+            self.reporter.round_log += f"\n--> Hit {target.name} with {attack['name']} dealing {damage} ({damage}-{damage_reduction}) damage"
+            target.hp -= (damage - damage_reduction)
+
+        if target.hp <= 0:
+            if actor.lifeform is self.pc:
+                self.pc_xp += target.xp_val
+            self.reporter.round_log += f"\n--> {target.name} has fallen!"
+            self.removeActor(target)
+            
+
+    
+    def doTurn(self, actor:Actor) -> None:
+        if not actor.hostiles:
+            self.reporter.round_log += "\n--> Waits..."
+            return
+        action_decider = random.randint(1, 5)
+        if action_decider == 0:
+            self.reporter.round_log += "\n--> Waits..."
+            return
+        target = random.choice(actor.hostiles)
+        attack = random.choice(actor.lifeform.attacks)
+        self.doAttack(actor, target, attack)
+
+    
+    def encounterEnd(self, isAlive=True):
+        print(f"\t--- [Encounter Ended] ---\n")
+        
+        if isAlive is False:
+            print(f"{self.pc.name} has fallen in battle!")
+        else:
+            self.pc.addXp(self.pc_xp)
+            self.pc.gold_flakes += 5
+            print(f"{self.pc.name} gained {self.pc_xp} xp.")
+
+        if self.downed:
+            print(f"\nCasualties:")
+            for lifeform in self.downed:
+                print(f"- {lifeform.name}")
+        
+        Interface.pressEnter()
+
+
+    def runEncounter(self) -> None:
+        Interface.encounterStart()
+        while self.inCombat:
+            self.reporter.nextRound()
+            self.sortTurnOrder() # TODO: sort turnorder each turn, inverse pop?
+            turn_order = list(self.turn_order)
+            while turn_order:
+                actor = turn_order[0]
+                if actor.lifeform not in self.downed:
+                    self.reporter.nextTurn(actor)
+                    self.doTurn(actor)
+                turn_order.remove(actor)
+            
+            Interface.characterInfo(self.pc)
+            print(self.reporter)
+            Interface.pressEnter()
+
+            if not self.enemies:
+                self.encounterEnd(self)
+                self.inCombat = False
+
+            if self.pc not in self.allies:
+                self.encounterEnd(self, False)
+                self.inCombat = False
+
+
+
+class EncounterBuilder():
+    """Builds preset encounter"""
+    def options(pc:PlayerCharacter, allies:list[Lifeform]=[]) -> Encounter:
+        if pc.hp < 0:
+            print(f"\n{pc.name} is dead...")
+            return Interface.pressEnter()
+
+        difficulty_dict = {"1": Difficulty.LIGHT, "2": Difficulty.AVERAGE, "3": Difficulty.DIFFICULT}
+
+        Interface.clear()
+        userInput = input("\nChoose a difficulty.\n[1] Light\n[2] Average\n[3] Difficult\n\n[Enter] Go Back\n\n")
+        if userInput not in difficulty_dict:
+            return Interface.pressEnter()
+        
+        difficulty = difficulty_dict[userInput]
+        scenario = random.choice(difficulty)
+        enemies = []
+        for enemy in scenario:
+            enemy_class = enemy[0]
+            lifeform:Lifeform = enemy_class(enemy[1])
+            if len(enemy) > 2:
+                lifeform.equipWeapon(Weapon(enemy[2]))
+            enemies.append(lifeform)
+
+        new_encounter = Encounter(pc, enemies, allies)
+        return new_encounter

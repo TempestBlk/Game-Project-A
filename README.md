@@ -1,8 +1,19 @@
-# A Turn-Based Combat Module
+# Game Project "A"
+
 ## Goals -
-    1. Build a module to handle turn based combat
-    2. Build a display window module
+    Version 0.3
+      - Player controlled turns
+      - Stamina System
+      - Items & Inventory
+      - Wearable System
+      - Gold Flakes
+      - Leveling
+      - Differing Encounters
+
 ## Update Log -
+> v0.2.6
+- rebuilt encounter system
+
 > v0.2.5
 - added 'press enter to go back' menu hints
 - Wearables now lose durability when hit
@@ -42,7 +53,8 @@
 
 > v0.2.0 - First Major Update!
   
-    Rebuilt this module from the ground up.
+    Rebuilt this module from the ground up!
+    The original update log is below.
 
 ### Updates Before v0.2.0
 

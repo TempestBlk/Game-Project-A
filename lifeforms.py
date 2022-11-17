@@ -4,11 +4,15 @@ from levelup import Levelup
 
 
 
-class Lifeform(ABCMeta):
+class Lifeform(metaclass=ABCMeta):
+    name: str
+    max_hp: int
     hp: int
     init: int
     attacks: list[Attack]
     dodge_class: int
+    xp: int
+    xp_val: int
     equipped: dict
     protection: dict
 

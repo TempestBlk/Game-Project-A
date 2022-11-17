@@ -1,12 +1,12 @@
 from interface import Interface
 from items import Weapon, Wearable
-
+from lifeforms import PlayerCharacter
 
 
 class Inventory():
 
 
-    def open(pc):
+    def open(pc:PlayerCharacter):
         inInventory = True
         while inInventory:
             Interface.clear()
@@ -27,9 +27,9 @@ class Inventory():
                     userInput = input("\n[1] Equip\n[2] Drop\n\n[Enter] Go Back\n\n")
                     if userInput == "1":
                         if type(selected_item) is Weapon:
-                            pc.equip_weapon(selected_item)
+                            pc.equipWeapon(selected_item)
                         elif type(selected_item) is Wearable:
-                            pc.equip_wearable(selected_item)
+                            pc.equipWearable(selected_item)
                     elif userInput == "2":
                         pc.inventory.remove(selected_item)
     
@@ -45,7 +45,7 @@ class Inventory():
                 Interface.pressEnter()
     
 
-    def equipped(pc, inInventory):
+    def equipped(pc:PlayerCharacter, inInventory):
         inEquipped = True
         while inEquipped:
             Interface.clear()
@@ -87,11 +87,11 @@ class Inventory():
                 userInput = input("\n[1] Unequip\n\n[Enter] Go Back\n\n")
                 if userInput == "1":
                     if equip_type == "mainHand":
-                        pc.unequip_weapon(selected_item)
+                        pc.unequipWeapon(selected_item)
                     elif equip_type == "offHand":
                         pass
                     elif equip_type == "wearable":
-                        pc.unequip_wearable(selected_item)
+                        pc.unequipWearable(selected_item)
             elif userInput == "0":
                 inEquipped = False
                 return inInventory
