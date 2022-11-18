@@ -1,6 +1,6 @@
 # Game Project "A"
 
-## Goals -
+## Goals
     Version 0.3
       - Player controlled turns
       - Stamina System
@@ -10,7 +10,7 @@
       - Leveling
       - Differing Encounters
 
-## Update Log -
+## Update Log
 > v0.2.6
 - rebuilt encounter system
 
