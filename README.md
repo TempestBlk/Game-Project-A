@@ -1,16 +1,28 @@
 # Game Project "A"
 
 ## Goals
-    Version 0.3
-      - Player controlled turns
-      - Stamina System
-      - Items & Inventory
-      - Wearable System
-      - Gold Flakes
-      - Leveling
-      - Differing Encounters
+
+> Version 0.4
+- Dedicated Display Window w/ GUI
+- Skills, Attributes, & Talents
+- Combat Stamina System
+- Skill-Based Challenges
+- Expanded Leveling
+- New Encounters in Different Areas
+- Part-Based Lifeforms
+
+> Version 0.3
+- [x] Area Map
+- [ ] Combat Map for Encounters
+- [ ] Player controlled turns
+- [x] Items & Inventory
+- [x] Wearable System
+- [x] Gold Flakes
+- [x] Leveling
+- [x] Differing Encounters
 
 ## Update Log
+
 > v0.2.7
 - integrated gridmap module
 
