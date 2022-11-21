@@ -12,14 +12,14 @@
 - Part-Based Lifeforms
 
 > Version 0.3
-- [x] Area Map
-- [ ] Combat Map for Encounters
-- [ ] Player controlled turns
-- [x] Items & Inventory
-- [x] Wearable System
-- [x] Gold Flakes
-- [x] Leveling
-- [x] Differing Encounters
+- ~~Area Map~~
+- Combat Map for Encounters
+- Player controlled turns
+- ~~Items & Inventory~~
+- ~~Wearable System~~
+- ~~Gold Flakes~~
+- ~~Leveling~~
+- ~~Differing Encounters~~
 
 ## Update Log
 
