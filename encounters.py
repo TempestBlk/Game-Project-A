@@ -1,29 +1,12 @@
 import random
+from errors import PlayerDied
 from dice import Dice
-from lifeforms import Lifeform, Mindless, Humanoid, PlayerCharacter
 from interface import Interface
 from items import Weapon
+from lifeforms import Lifeform, Mindless, Humanoid, PlayerCharacter
 
 
-class Difficulty():
-    """Stores possible encounter enemies by difficulty"""
-    # NOTE: list[list[lifeform, name, main_hand_weapon]]
-    LIGHT = [
-        [[Mindless, "Mindless-1"]],
-        [[Humanoid, "Vagrant-1"]]
-    ]
-    AVERAGE = [
-        [[Humanoid, "Vagrant-1", Weapon.shiv]],
-        [[Mindless, "Mindless-1"], [Mindless, "Mindless-2"]]
-    ]
-    DIFFICULT = [
-        [[Humanoid, "Vagrant-1", Weapon.metal_pipe], [Humanoid, "Vagrant-2", Weapon.shiv]],
-        [[Mindless, "Mindless-1", Weapon.metal_pipe], [Mindless, "Mindless-1"], [Mindless, "Mindless-1"]]
-    ]
-
-
-
-class Actor():
+class CombatActor():
     """Model for each combatant in encounter"""
     def __init__(self, lifeform:Lifeform, group:list[Lifeform], hostiles:list[Lifeform]) -> None:
         self.lifeform = lifeform
@@ -32,7 +15,7 @@ class Actor():
 
 
 
-class EncounterReporter(object):
+class EncounterReporter:
     """Prints encounter events to console"""
     border = "\n\n-----------------------------"
 
@@ -74,7 +57,7 @@ class EncounterReporter(object):
         return f"{lifeform.name} | {health}\nMain-Hand: {mainHand} | Off-Hand: {offHand}"
 
 
-    def nextTurn(self, actor:Actor) -> None:
+    def nextTurn(self, actor:CombatActor) -> None:
         self.turn_num += 1
         header = f"\n\nTurn {self.turn_num}"
         header += " : " + self.actorInfo(actor.lifeform)
@@ -82,14 +65,19 @@ class EncounterReporter(object):
 
 
 class Encounter():
-    """Handles encounters"""
-    def __init__(self, pc:PlayerCharacter, enemies:list[Lifeform], allies:list[Lifeform]=[]) -> None:
+    """
+    A turn based combat encounter.
+    """
+    
+    def __init__(self, pc:PlayerCharacter, enemies:list[Lifeform], allies:list[Lifeform]=None) -> None:
         self.pc = pc
+        if allies is None:
+            allies = []
         self.allies = allies + [pc]
         self.enemies = enemies
 
         self.combatants = self.buildCombatants()
-        self.turn_order:list[Actor]
+        self.turn_order:list[CombatActor]
         self.sortTurnOrder()
         self.reporter = EncounterReporter()
 
@@ -98,12 +86,12 @@ class Encounter():
         self.inCombat = True
 
 
-    def buildCombatants(self) -> list[Actor]:
+    def buildCombatants(self) -> list[CombatActor]:
         combatants = []
         for lifeform in self.allies:
-            combatants.append(Actor(lifeform, self.allies, self.enemies))
+            combatants.append(CombatActor(lifeform, self.allies, self.enemies))
         for lifeform in self.enemies:
-            combatants.append(Actor(lifeform, self.enemies, self.allies))
+            combatants.append(CombatActor(lifeform, self.enemies, self.allies))
         return combatants
 
     
@@ -119,7 +107,7 @@ class Encounter():
         self.downed.append(target)
 
 
-    def doAttack(self, actor:Actor, target:Lifeform, attack:dict) -> None:
+    def doAttack(self, actor:CombatActor, target:Lifeform, attack:dict) -> None:
         toHit = Dice.roll([1,20,attack["toHit"]])
         toHit = toHit//2
         if toHit < target.dodge_class:
@@ -159,7 +147,7 @@ class Encounter():
             
 
     
-    def doTurn(self, actor:Actor) -> None:
+    def doTurn(self, actor:CombatActor) -> None:
         if not actor.hostiles:
             self.reporter.round_log += "\n--> Waits..."
             return
@@ -208,30 +196,51 @@ class Encounter():
             Interface.pressEnter()
 
             if not self.enemies:
-                self.encounterEnd(self)
+                self.encounterEnd()
                 self.inCombat = False
 
             if self.pc not in self.allies:
-                self.encounterEnd(self, False)
+                self.encounterEnd(False)
                 self.inCombat = False
+                raise PlayerDied(self.pc)
 
 
 
 class EncounterBuilder():
-    """Builds preset encounter"""
-    def options(pc:PlayerCharacter, allies:list[Lifeform]=[]) -> Encounter:
+    """Builds an encounter based on"""
+
+    # NOTE: list[list[lifeform, name, main_hand_weapon]]
+    LIGHT = [
+        [[Mindless, "Mindless-1"]],
+        [[Humanoid, "Vagrant-1"]]
+    ]
+    AVERAGE = [
+        [[Humanoid, "Vagrant-1", Weapon.shiv]],
+        [[Mindless, "Mindless-1"], [Mindless, "Mindless-2"]]
+    ]
+    DIFFICULT = [
+        [[Humanoid, "Vagrant-1", Weapon.metal_pipe], [Humanoid, "Vagrant-2", Weapon.shiv]],
+        [[Mindless, "Mindless-1", Weapon.metal_pipe], [Mindless, "Mindless-1"], [Mindless, "Mindless-1"]]
+    ]
+
+
+    @classmethod
+    def build(self, pc:PlayerCharacter, difficulty_level:int=None, allies:list[Lifeform]=[]) -> Encounter:
         if pc.hp < 0:
             print(f"\n{pc.name} is dead...")
             return Interface.pressEnter()
 
-        difficulty_dict = {"1": Difficulty.LIGHT, "2": Difficulty.AVERAGE, "3": Difficulty.DIFFICULT}
+        difficulty_dict = {1: self.LIGHT, 2: self.AVERAGE, 3: self.DIFFICULT}
 
-        Interface.clear()
-        userInput = input("\nChoose a difficulty.\n[1] Light\n[2] Average\n[3] Difficult\n\n[Enter] Go Back\n\n")
-        if userInput not in difficulty_dict:
-            return Interface.pressEnter()
-        
-        difficulty = difficulty_dict[userInput]
+        if difficulty_level is None:
+            Interface.clear()
+            userInput = input("\nChoose a difficulty.\n[1] Light\n[2] Average\n[3] Difficult\n\n[Enter] Go Back\n\n")
+            if userInput not in difficulty_dict:
+                return Interface.pressEnter()
+            difficulty = difficulty_dict[userInput]
+        else:
+            difficulty = difficulty_dict[difficulty_level]
+
         scenario = random.choice(difficulty)
         enemies = []
         for enemy in scenario:
@@ -241,5 +250,5 @@ class EncounterBuilder():
                 lifeform.equipWeapon(Weapon(enemy[2]))
             enemies.append(lifeform)
 
-        new_encounter = Encounter(pc, enemies, allies)
-        return new_encounter
+        encounter = Encounter(pc, enemies, allies)
+        return encounter

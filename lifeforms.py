@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from attacks import Attack
 from levelup import Levelup
-
+from items import Item, Weapon
 
 
 class Lifeform(metaclass=ABCMeta):
@@ -17,7 +17,7 @@ class Lifeform(metaclass=ABCMeta):
     protection: dict
 
     @abstractmethod
-    def equipWeapon() -> abs:
+    def equipWeapon() -> None:
         pass
 
 
@@ -28,6 +28,7 @@ class Humanoid(Lifeform):
     def __init__(self, name):
         self.npcid = Humanoid.npcid
         Humanoid.npcid += 1
+
         self.name = name
         self.max_hp = 16
         self.hp = self.max_hp
@@ -48,7 +49,7 @@ class Humanoid(Lifeform):
         for attack in list(self.unarmed):
             attack['givenBy'] = 'unarmed'
             self.attacks.append(attack)
-        self.inventory = []
+        self.inventory:list[Item] = []
         self.protection = {
             'head': {'slash':0, 'pierce':0, 'blunt':0},
             'torso': {'slash':0, 'pierce':0, 'blunt':0},
@@ -78,7 +79,7 @@ class Humanoid(Lifeform):
             self.attacks.append(attack)
 
 
-    def unequipWeapon(self, selected_weapon, unarmed=True):
+    def unequipWeapon(self, selected_weapon:Weapon, unarmed=True):
         for attack in list(self.attacks):
             if attack['givenBy'] == selected_weapon.name:
                 self.attacks.remove(attack)
@@ -90,7 +91,7 @@ class Humanoid(Lifeform):
                 self.attacks.append(attack)
 
     
-    def equipWearable(self, wearable):
+    def equipWearable(self, wearable:list):
         if self.equipped['wearable']:
             self.equipped['wearable'].append(wearable)
         else:

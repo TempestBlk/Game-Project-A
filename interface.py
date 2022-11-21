@@ -1,4 +1,5 @@
 import os
+from lifeforms import Lifeform, PlayerCharacter
 
 
 class Interface():
@@ -12,6 +13,12 @@ class Interface():
         Interface.clear()
 
 
+    def alert(msg):
+        Interface.clear()
+        print(msg)
+        Interface.pressEnter()
+
+
     def startup():
         Interface.clear()
         print("--------------[ Turn-Based Combat ]--------------")
@@ -23,9 +30,10 @@ class Interface():
         Interface.pressEnter()
 
 
-    def characterInfo(pc, stats=True):
+    @staticmethod
+    def characterInfo(pc:PlayerCharacter, stats=True):
         if stats:
-            print(f"\n[{pc.name}]\n\nHp: {pc.hp}/{pc.max_hp} | Level: {pc.level} | Xp: {pc.xp}\nInitiative: {pc.init} | Dodge Class: {pc.dodge_class}\nGold Flakes: {pc.gold_flakes}\n")
+            print(f"\n[{pc.name}]\nHp: {pc.hp}/{pc.max_hp} | Level: {pc.level} | Xp: {pc.xp}\nInitiative: {pc.init} | Dodge Class: {pc.dodge_class}\nGold Flakes: {pc.gold_flakes}")
 
         if pc.equipped['mainHand'] is not None:
             mainHand = f"{pc.equipped['mainHand'].name} ({pc.equipped['mainHand'].durability})"
@@ -44,16 +52,9 @@ class Interface():
         else:
             print(f"Wearing: None")
 
-
-    def mainMenu(pc):
-        print("\t--- [Main Menu] ---\n")
-        Interface.characterInfo(pc)
-        # print("\n")
-        userInput = input("\n[1] Next Encounter\n[2] Inventory\n[3] Merchant\n[4] Doctor\n[5] Quit Game\n\n")
-        return userInput
-
     
-    def levelupMessage(lifeform):
+    @staticmethod
+    def levelupMessage(lifeform:Lifeform):
         Interface.clear()
         print(f"\t--- [Levelup] ---")
         print(f"\n{lifeform.name} has reached experience level {lifeform.level}!")

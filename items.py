@@ -1,8 +1,10 @@
 from attacks import Attack
 
 
-
 class Item():
+    name:str
+    durability:int
+    basePrice:int
 
     def build(self, item_type, pattern):
         if item_type == 'weapon':
@@ -49,11 +51,11 @@ class Weapon(Item):
 
     def __init__(self, weapon):
         self.id = weapon['id']
-        self.name = weapon['name']
-        self.max_durability = weapon['durability']
-        self.durability = self.max_durability
-        self.basePrice = weapon['basePrice']
-        self.attacks = weapon['attacks']
+        self.name:str = weapon['name']
+        self.max_durability:int = weapon['durability']
+        self.durability:int = self.max_durability
+        self.basePrice:int = weapon['basePrice']
+        self.attacks:list[Attack] = weapon['attacks']
 
 
 

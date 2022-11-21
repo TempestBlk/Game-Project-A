@@ -1,7 +1,3 @@
-from interface import Interface
-
-
-
 class Levelup():
     level_list = {
         1: 0,
@@ -13,7 +9,9 @@ class Levelup():
     }
 
 
-    def check(lifeform):
+    @classmethod
+    def check(self, lifeform):
+        from interface import Interface
         checking = True
         while checking:
             if lifeform.xp >= Levelup.level_list[(lifeform.level + 1)]:

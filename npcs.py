@@ -1,25 +1,40 @@
+from abc import ABCMeta
 from interface import Interface
 from items import Item, Weapon, Wearable
+from lifeforms import PlayerCharacter
+
+
+class Npc(metaclass=ABCMeta):
+    pass
 
 
 
-class Npc():
+class Doctor(Npc):
     pass
 
 
 
 class Merchant(Npc):
-    def BuyMenu(merchant, pc, comment, items, item_type):
+    title_card:str
+    greeting:str
+    not_enough:str
+
+    sell_mod:float
+    buy_mod:float
+    for_sale:dict
+
+    @classmethod
+    def BuyMenu(self, pc:PlayerCharacter, comment, items, item_type):
         inBuyMenu = True
         while inBuyMenu:
             Interface.clear()
-            print(merchant.title_card)
+            print(self.title_card)
             print(comment)
             item_num = 0
             item_dict = {}
             for item in items:
                 item_num += 1
-                final_price = round(item['basePrice'] * merchant.buy_mod)
+                final_price = round(item['basePrice'] * self.buy_mod)
                 item_dict[f"{item_num}"] = [item, final_price]
                 print(f"[{item_num}] {item['name']} - {final_price} flakes")
             userInput = input("\n[Enter] Go back\n\n")
@@ -33,22 +48,23 @@ class Merchant(Npc):
                         built_item = Item.build(Item, item_type, item)
                         pc.inventory.append(built_item)
                 else:
-                    print(merchant.not_enough)
+                    print(self.not_enough)
                     Interface.pressEnter()
             else:
                 inBuyMenu = False
 
     
-    def SellMenu(merchant, pc, comment):
+    @classmethod
+    def SellMenu(self, pc:PlayerCharacter, comment:str):
         Interface.clear()
-        print(merchant.title_card)
+        print(self.title_card)
         print(comment)
         print(f"\nInventory:")
         item_num = 0
         item_dict = {}   
         for item in list(pc.inventory):
             item_num += 1
-            final_price = round(item.basePrice * merchant.sell_mod)
+            final_price = round(item.basePrice * self.sell_mod)
             item_dict[f"{item_num}"] = [item, final_price]
             print(f"[{item_num}] {item.name} - {final_price} flakes")
         userInput = input("\n[Enter] Go Back\n\n")
@@ -62,17 +78,14 @@ class Merchant(Npc):
 
 
 
-class Doctor(Npc):
-    def doctorMenu(pc):
-        pass
-
-
 
 class SeniorResearcherLydia(Doctor):
-    title_card = "\t--- [Doctor] ---\n\n\n[Senior Researcher Lydia]\n"
+    from lifeforms import PlayerCharacter
+    
+    title_card = "\t--- [Senior Researcher Lydia] ---\n\n"
 
-
-    def startDialogue(pc):
+    @staticmethod
+    def startDialogue(pc:PlayerCharacter):
         Interface.clear()
         print(SeniorResearcherLydia.title_card)
 
@@ -85,7 +98,7 @@ class SeniorResearcherLydia(Doctor):
         elif pc.hp > 0:
             print("Set them down here! We'll start surgery immediately.")
         else:
-            print(f"{pc.name} is dead...\nGet their body in the Anubis Chamber.")
+            print(f"{pc.name} is dead...\nGet them in the .")
         pc.hp = pc.max_hp
 
         Interface.pressEnter()
@@ -93,8 +106,9 @@ class SeniorResearcherLydia(Doctor):
 
 
 class QuartermasterMathias(Merchant):
-    title_card = "\t--- [Merchant] ---\n\n\n[Quartermaster Mathias]\n"
+    title_card = "\t--- [Quartermaster Mathias] ---\n\n"
     greeting = "Welcome. How can I help?\n"
+    
     not_enough = "\nYou'll need more flakes for this..."
     sell_mod = 0.25
     buy_mod = 1.20
@@ -104,28 +118,25 @@ class QuartermasterMathias(Merchant):
         }
     sell_to = True
 
-
-    def startDialogue(pc):
-        self = QuartermasterMathias
-
+    @classmethod
+    def startDialogue(self, pc):
         inDialogue = True
         while inDialogue:
             Interface.clear()
             print(self.title_card)
             print(self.greeting)
-
+            
             userInput = input("\n[1] Weapons\n[2] Wearables\n[3] Sell\n\n[Enter] Go Back\n\n")
-
             if userInput == "1":
                 comment = "Tired of beating Mindless with your fists?\nHave a look at these.\n"
                 items = self.for_sale['weapons']
-                Merchant.BuyMenu(self, pc, comment, items, 'weapon')
+                self.BuyMenu(pc, comment, items, 'weapon')
             elif userInput == "2":
                 comment = "Most've our armor's in-use...\nThis is all I've got left.\n"
                 items = self.for_sale['wearables']
-                Merchant.BuyMenu(self, pc, comment, items, 'wearable')
+                self.BuyMenu(pc, comment, items, 'wearable')
             elif userInput == "3":
                 comment = "What've you got?"
-                Merchant.SellMenu(self, pc, comment)
+                self.SellMenu(pc, comment)
             else:
                 inDialogue = False

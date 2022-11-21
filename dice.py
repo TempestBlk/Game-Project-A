@@ -1,7 +1,6 @@
 import random
 
 
-
 class Dice():
     def roll(roll) -> int:
         amount = roll[0]
