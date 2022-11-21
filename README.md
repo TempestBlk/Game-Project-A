@@ -59,7 +59,7 @@
     Rebuilt this module from the ground up!
     The original update log is below.
 
-### Updates Before v0.2.0
+### Before Version 0.2
 
 > v0.1.5
 - added 'Flesh Butcher' to entities
