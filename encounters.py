@@ -133,10 +133,10 @@ class Encounter():
             self.reporter.round_log += f"\n--> {attack} absorbed by {target.name}'s armor"
             return
         elif damage_reduction >= damage:
-            self.reporter.round_log += f"\n--> Hit {target.name} with {attack['name']} dealing 1 ({damage}-{damage_reduction}) damage"
+            self.reporter.round_log += f"\n--> Hit {target.name} with {attack['name']} dealing 1 ({damage}-{(damage - 1)}) damage"
             target.hp -= 1
         else:
-            self.reporter.round_log += f"\n--> Hit {target.name} with {attack['name']} dealing {damage} ({damage}-{damage_reduction}) damage"
+            self.reporter.round_log += f"\n--> Hit {target.name} with {attack['name']} dealing {(damage - damage_reduction)} ({damage}-{damage_reduction}) damage"
             target.hp -= (damage - damage_reduction)
 
         if target.hp <= 0:
