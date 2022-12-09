@@ -1,4 +1,8 @@
 class Attack():
+    """
+    TODO:
+    """
+
     metal_pipe_slam = {
         "id": "metal_pipe_slam",
         "name": "Slam",

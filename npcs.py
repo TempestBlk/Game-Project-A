@@ -37,6 +37,7 @@ class Merchant(Npc):
                 final_price = round(item['basePrice'] * self.buy_mod)
                 item_dict[f"{item_num}"] = [item, final_price]
                 print(f"[{item_num}] {item['name']} - {final_price} flakes")
+                
             userInput = input("\n[Enter] Go back\n\n")
             if userInput in item_dict:
                 item = item_dict[userInput][0]
@@ -67,6 +68,7 @@ class Merchant(Npc):
             final_price = round(item.basePrice * self.sell_mod)
             item_dict[f"{item_num}"] = [item, final_price]
             print(f"[{item_num}] {item.name} - {final_price} flakes")
+
         userInput = input("\n[Enter] Go Back\n\n")
         if userInput in item_dict:
             item_num = userInput
@@ -80,6 +82,9 @@ class Merchant(Npc):
 
 
 class SeniorResearcherLydia(Doctor):
+    """
+    TODO:
+    """
     from lifeforms import PlayerCharacter
     
     title_card = "\t--- [Senior Researcher Lydia] ---\n\n"
@@ -106,6 +111,10 @@ class SeniorResearcherLydia(Doctor):
 
 
 class QuartermasterMathias(Merchant):
+    """
+    TODO:
+    """
+
     title_card = "\t--- [Quartermaster Mathias] ---\n\n"
     greeting = "Welcome. How can I help?\n"
     

@@ -5,6 +5,10 @@ from items import Item, Weapon
 
 
 class Lifeform(metaclass=ABCMeta):
+    """
+    TODO:
+    """
+
     name: str
     max_hp: int
     hp: int
@@ -23,12 +27,11 @@ class Lifeform(metaclass=ABCMeta):
 
 
 class Humanoid(Lifeform):
-    npcid = 0
+    """
+    TODO:
+    """
 
     def __init__(self, name):
-        self.npcid = Humanoid.npcid
-        Humanoid.npcid += 1
-
         self.name = name
         self.max_hp = 16
         self.hp = self.max_hp
@@ -39,17 +42,22 @@ class Humanoid(Lifeform):
         self.level = 1
         self.xp_val = 10
         self.gold_flakes = 0
+        
         self.unarmed = [Attack.fists_one_two]
+        
         self.equipped = {
             "mainHand": None,
             "offHand": None,
             "wearable": [],
             }
+
         self.attacks = []
         for attack in list(self.unarmed):
             attack['givenBy'] = 'unarmed'
             self.attacks.append(attack)
+
         self.inventory:list[Item] = []
+
         self.protection = {
             'head': {'slash':0, 'pierce':0, 'blunt':0},
             'torso': {'slash':0, 'pierce':0, 'blunt':0},
@@ -118,11 +126,16 @@ class Humanoid(Lifeform):
 
 
 class PlayerCharacter(Humanoid):
+    """
+    TODO:
+    """
+
     def __init__(self, name, background):
         super().__init__(name)
         self.background = background
         self.xp_val = 0
     
+
     def addXp(self, value):
         self.xp += value
         Levelup.check(self)
@@ -130,6 +143,10 @@ class PlayerCharacter(Humanoid):
 
 
 class Mindless(Humanoid):
+    """
+    TODO:
+    """
+
     def __init__(self, name):
         super().__init__(name)
         self.max_hp = 12

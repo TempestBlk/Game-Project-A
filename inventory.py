@@ -3,25 +3,28 @@ from items import Weapon, Wearable
 from lifeforms import PlayerCharacter
 
 
-class Inventory():
+class Inventory:
+    """
+    TODO:
+    """
 
-
-    def open(pc:PlayerCharacter):
+    @staticmethod
+    def open(pc:PlayerCharacter) -> None:
         inInventory = True
         while inInventory:
             Interface.clear()
-            print("\t--- [Inventory] ---\n\n")
+            print("\t--- [ Inventory ] ---\n\n")
             Interface.characterInfo(pc, stats=False)
             if pc.inventory:
-                print("\n[E] Switch to equipped")
-                print(f"\nInventory:")
+                print("\n\n[E] Equip / Unequip Menu\n")
+                print(f"\nInventory: (enter an item number to select it)\n")
                 item_num = 0
                 item_dict = {}
                 for item in list(pc.inventory):
                     item_num += 1
                     item_dict[f"{item_num}"] = item
                     print(f"[{item_num}] {item.name} ({item.durability})")
-                userInput = input("\n[Enter] Go Back\n\n")
+                userInput = input("\n\n[Enter] Go Back\n\n")
                 if userInput in item_dict:
                     selected_item = item_dict[userInput]
                     userInput = input("\n[1] Equip\n[2] Drop\n\n[Enter] Go Back\n\n")
@@ -32,20 +35,18 @@ class Inventory():
                             pc.equipWearable(selected_item)
                     elif userInput == "2":
                         pc.inventory.remove(selected_item)
-    
                 elif userInput.lower() == "e":
                     inInventory = Inventory.equipped(pc, inInventory)
-                
                 else:
                     inInventory = False
-
             else:
                 print("\nInventory: None")
                 inInventory = False
                 Interface.pressEnter()
     
 
-    def equipped(pc:PlayerCharacter, inInventory):
+    @staticmethod
+    def equipped(pc:PlayerCharacter, inInventory) -> bool:
         inEquipped = True
         while inEquipped:
             Interface.clear()
@@ -78,7 +79,7 @@ class Inventory():
             else:
                 print("None")
             
-            print("\n[E] Switch to inventory")
+            print("\n\n[E] Switch to inventory")
 
             userInput = input("\n[Enter] Go Back\n\n")
             if userInput in item_dict:

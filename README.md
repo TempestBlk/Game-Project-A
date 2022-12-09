@@ -10,6 +10,7 @@
 - Expanded Leveling
 - New Encounters in Different Areas
 - Part-Based Lifeforms
+- Saved Game Slots
 
 > Version 0.3
 - ~~Area Map~~
@@ -24,7 +25,7 @@
 ## Update Log
 
 > v0.2.7
-- integrated gridmap module
+- added areamap with locations and encounters
 
 > v0.2.6
 - rebuilt encounter system

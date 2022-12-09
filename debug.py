@@ -2,9 +2,10 @@ from lifeforms import Humanoid
 from interface import Interface
 
 
-
 class Debug():
-    def show_attacks(humanoid):
+
+    @staticmethod
+    def showAttacks(humanoid:Humanoid):
         print(f"\n[ {humanoid.name} ]\nmainHand: {humanoid.equipped['mainHand']} | offHand: {humanoid.equipped['offHand']} | wearable: {humanoid.equipped['wearable']}")
         print("attacks:")
         for attack in humanoid.attacks:
@@ -14,16 +15,20 @@ class Debug():
             print(f"\tname: {item.name} | durability: {item.durability}")
 
 
-    def test_npcid():
+    @staticmethod
+    def testNpcid():
         npc1 = Humanoid("name")
         npc2 = Humanoid("name")
         npc3 = Humanoid("name")
         print(f"\t\t{npc1.npcid} | {npc2.npcid} | {npc3.npcid}")
 
     
-    def show_protection(humanoid):
+    @staticmethod
+    def showProtection(humanoid:Humanoid):
         Interface.clear()
-        print("\n\n")
+        print("\t---[ Protection Values by Body Part ]---\n\n")
+        Interface.characterInfo(humanoid, stats=False)
+        print("\n")
         for body_part in humanoid.protection:
-            print(f"{body_part}: {humanoid.protection[body_part]}")
+            print(f"{str(body_part).title()} -> {humanoid.protection[body_part]}")
         Interface.pressEnter()

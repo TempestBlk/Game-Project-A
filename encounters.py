@@ -6,8 +6,11 @@ from items import Weapon
 from lifeforms import Lifeform, Mindless, Humanoid, PlayerCharacter
 
 
-class CombatActor():
-    """Model for each combatant in encounter"""
+class CombatActor:
+    """
+    Wrapper class for Lifeforms entering combat encounters.
+    """
+
     def __init__(self, lifeform:Lifeform, group:list[Lifeform], hostiles:list[Lifeform]) -> None:
         self.lifeform = lifeform
         self.group = group
@@ -16,8 +19,12 @@ class CombatActor():
 
 
 class EncounterReporter:
-    """Prints encounter events to console"""
+    """
+    Prints encounter events to console
+    """
+
     border = "\n\n-----------------------------"
+
 
     def __init__(self) -> None:
         self.round_num = 0
@@ -113,19 +120,16 @@ class Encounter():
         if toHit < target.dodge_class:
             self.reporter.round_log += f"\n--> Missed {target.name} with {attack['name']}"
             return
-        
+
         damage_reduction:int = target.protection['torso'][attack['damageType']] // 5
         protection = damage_reduction // 2
-
         for item in list(target.equipped['wearable']): # TODO: check for item break
             item.durability -= 1
-
         if (protection + target.dodge_class) > toHit:
             self.reporter.round_log += f"\n--> {attack} absorbed by {target.name}'s armor"
             return
-
+        
         damage = Dice.roll(attack['damage']) # TODO: attack.givenby loses durability
-
         if damage_reduction == 0:
             self.reporter.round_log += f"\n--> Hit {target.name} with {attack['name']} dealing {damage} damage"
             target.hp -= damage
@@ -160,16 +164,14 @@ class Encounter():
         self.doAttack(actor, target, attack)
 
     
-    def encounterEnd(self, isAlive=True):
+    def encounterEnd(self, isAlive=True) -> None:
         print(f"\t--- [Encounter Ended] ---\n")
-        
         if isAlive is False:
             print(f"{self.pc.name} has fallen in battle!")
         else:
             self.pc.addXp(self.pc_xp)
             self.pc.gold_flakes += 5
             print(f"{self.pc.name} gained {self.pc_xp} xp.")
-
         if self.downed:
             print(f"\nCasualties:")
             for lifeform in self.downed:
@@ -207,7 +209,9 @@ class Encounter():
 
 
 class EncounterBuilder():
-    """Builds an encounter based on"""
+    """
+    Builds an encounter based on
+    """
 
     # NOTE: list[list[lifeform, name, main_hand_weapon]]
     LIGHT = [
@@ -225,18 +229,21 @@ class EncounterBuilder():
 
 
     @classmethod
-    def build(self, pc:PlayerCharacter, difficulty_level:int=None, allies:list[Lifeform]=[]) -> Encounter:
+    def build(self, pc:PlayerCharacter, difficulty_level:str=None, allies:list[Lifeform]=None) -> Encounter:
         if pc.hp < 0:
             print(f"\n{pc.name} is dead...")
             return Interface.pressEnter()
+        
+        if allies is None:
+            allies = []
 
-        difficulty_dict = {1: self.LIGHT, 2: self.AVERAGE, 3: self.DIFFICULT}
+        difficulty_dict = {"1": self.LIGHT, "2": self.AVERAGE, "3": self.DIFFICULT}
 
         if difficulty_level is None:
             Interface.clear()
             userInput = input("\nChoose a difficulty.\n[1] Light\n[2] Average\n[3] Difficult\n\n[Enter] Go Back\n\n")
             if userInput not in difficulty_dict:
-                return Interface.pressEnter()
+                return
             difficulty = difficulty_dict[userInput]
         else:
             difficulty = difficulty_dict[difficulty_level]
