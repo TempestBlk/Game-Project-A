@@ -2,6 +2,10 @@ from attacks import Attack
 
 
 class Item():
+    """
+    TODO:
+    """
+
     name:str
     durability:int
     basePrice:int
@@ -16,6 +20,10 @@ class Item():
 
 
 class Weapon(Item):
+    """
+    TODO:
+    """
+
     shiv = {
         "id": "shiv",
         "name": "Shiv",
@@ -48,8 +56,7 @@ class Weapon(Item):
         "attacks": [Attack.f_collective_solspear_impale]
     }
 
-
-    def __init__(self, weapon):
+    def __init__(self, weapon) -> None:
         self.id = weapon['id']
         self.name:str = weapon['name']
         self.max_durability:int = weapon['durability']
@@ -60,10 +67,12 @@ class Weapon(Item):
 
 
 class Wearable(Item):
-    # protection for parts --> [slash, pierce, blunt]
-    # onEquip add protection scores to lifeform stats
-    # every 5 protection = 1 damage reduction
-    # every 10 protection = -1 to hit
+    """
+    - protection for parts --> [slash, pierce, blunt]
+    - onEquip add protection scores to lifeform stats
+    - every 5 protection = 1 damage reduction
+    - every 10 protection = -1 to hit
+    """
 
     torn_clothes = {
         "id": "torn_clothes",
@@ -194,7 +203,7 @@ class Wearable(Item):
         }
     }
 
-    def __init__(self, wearable):
+    def __init__(self, wearable) -> None:
         self.id = wearable['id']
         self.name = wearable['name']
         self.durability = wearable['durability']

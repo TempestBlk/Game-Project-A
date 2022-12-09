@@ -10,6 +10,7 @@
 - Expanded Leveling
 - New Encounters in Different Areas
 - Part-Based Lifeforms
+- Saved Game Slots
 
 > Version 0.3
 - ~~Area Map~~
@@ -23,8 +24,14 @@
 
 ## Update Log
 
+> v0.2.8
+- improved in-hub options
+- initial setup for combat map
+- various improvements
+- level-cap 6 -> 10
+
 > v0.2.7
-- integrated gridmap module
+- added traversable area map with locations and encounters
 
 > v0.2.6
 - rebuilt encounter system
