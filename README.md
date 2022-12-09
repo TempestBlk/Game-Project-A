@@ -24,8 +24,14 @@
 
 ## Update Log
 
+> v0.2.8
+- improved in-hub options
+- initial setup for combat map
+- various improvements
+- level-cap 6 -> 10
+
 > v0.2.7
-- added areamap with locations and encounters
+- added traversable area map with locations and encounters
 
 > v0.2.6
 - rebuilt encounter system
