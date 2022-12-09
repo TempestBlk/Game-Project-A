@@ -24,6 +24,9 @@
 
 ## Update Log
 
+> v0.2.9
+- minor bugfix
+
 > v0.2.8
 - improved in-hub options
 - initial setup for combat map

@@ -16,33 +16,32 @@ class Inventory:
             print("\t--- [ Inventory ] ---\n\n")
             Interface.characterInfo(pc, stats=False)
             if pc.inventory:
-                print("\n\n[E] Equip / Unequip Menu\n")
-                print(f"\nInventory: (enter an item number to select it)\n")
-                item_num = 0
-                item_dict = {}
-                for item in list(pc.inventory):
-                    item_num += 1
-                    item_dict[f"{item_num}"] = item
-                    print(f"[{item_num}] {item.name} ({item.durability})")
-                userInput = input("\n\n[Enter] Go Back\n\n")
-                if userInput in item_dict:
-                    selected_item = item_dict[userInput]
-                    userInput = input("\n[1] Equip\n[2] Drop\n\n[Enter] Go Back\n\n")
-                    if userInput == "1":
-                        if type(selected_item) is Weapon:
-                            pc.equipWeapon(selected_item)
-                        elif type(selected_item) is Wearable:
-                            pc.equipWearable(selected_item)
-                    elif userInput == "2":
-                        pc.inventory.remove(selected_item)
-                elif userInput.lower() == "e":
-                    inInventory = Inventory.equipped(pc, inInventory)
-                else:
-                    inInventory = False
-            else:
+                print(f"\n(enter an item's number to select it)")
+            else:    
                 print("\nInventory: None")
+            item_num = 0
+            item_dict = {}
+            for item in list(pc.inventory):
+                item_num += 1
+                item_dict[f"{item_num}"] = item
+                print(f"[{item_num}] {item.name} ({item.durability})")
+            print("\n[E] Switch to equipped")
+            userInput = input("[Enter] Go Back\n\n")
+            if userInput in item_dict:
+                selected_item = item_dict[userInput]
+                userInput = input("\n[1] Equip\n[2] Drop\n\n[Enter] Go Back\n\n")
+                if userInput == "1":
+                    if type(selected_item) is Weapon:
+                        pc.equipWeapon(selected_item)
+                    elif type(selected_item) is Wearable:
+                        pc.equipWearable(selected_item)
+                elif userInput == "2":
+                    pc.inventory.remove(selected_item)
+            elif userInput.lower() == "e":
+                inInventory = Inventory.equipped(pc, inInventory)
+            else:
                 inInventory = False
-                Interface.pressEnter()
+            
     
 
     @staticmethod
@@ -51,6 +50,7 @@ class Inventory:
         while inEquipped:
             Interface.clear()
             print("\t--- [Equipped] ---\n\n")
+            print(f"(enter an item's number to select it)")
             item_num = 0
             item_dict = {}
             if pc.equipped['mainHand'] is not None:
@@ -79,9 +79,8 @@ class Inventory:
             else:
                 print("None")
             
-            print("\n\n[E] Switch to inventory")
-
-            userInput = input("\n[Enter] Go Back\n\n")
+            print("\n[E] Switch to inventory")
+            userInput = input("[Enter] Go Back\n\n")
             if userInput in item_dict:
                 selected_item = item_dict[userInput][0]
                 equip_type = item_dict[userInput][1]
